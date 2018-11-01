@@ -15,7 +15,7 @@ var cerebroCli = cerebro.Client{}
 // fun main()
 func main() {
     router := mux.NewRouter()
-    router.HandleFunc("/text", TextRequest).Methods("POST")
+    router.HandleFunc("/talk/text", TextRequest).Methods("POST")
     log.Fatal(http.ListenAndServe(":8000", router))
 }
 
@@ -23,7 +23,7 @@ type RequestBody struct {
     Text 	string   `json:"text,omitempty"`
 }
 type ResponseBody struct {
-    Vocal  	string `json:"vox,omitempty"`
+    Vocal  	string `json:"vocal,omitempty"`
 }
 
 
@@ -53,5 +53,8 @@ func TextRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func CallSkill(nlu cerebro.NLU) anima.NLG {
-	return anima.NLG{Sentence:"It is {time} o'clock"}
+	if nlu.Skill == "hello" && nlu.Action == "hello" {
+		return anima.NLG{Sentence: "Bonjour"}
+	}
+	return anima.NLG{Sentence: "Erreur"}
 }
