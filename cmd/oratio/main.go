@@ -11,6 +11,7 @@ import (
 )
 
 var cerebroCli = cerebro.Client{}
+var animaCli = anima.Client{}
 
 // fun main()
 func main() {
@@ -29,29 +30,32 @@ type ResponseBody struct {
 
 func TextRequest(w http.ResponseWriter, r *http.Request) {
 
-	// Read body
+	// Read the request
+	body, err := ReadRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
+
+	// Execute the processing flow
+	var nlu = cerebroCli.UnderstandText(body.Text)
+	var nlg = CallSkill(nlu)
+	var vox = animaCli.GenerateSentence(nlg)
+
+	// Build the response
+	json.NewEncoder(w).Encode(ResponseBody{Vocal: vox})
+}
+
+func ReadRequest(r *http.Request) (req RequestBody, err error) {
 	b, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
-		http.Error(w, err.Error(), 500)
 		return
 	}
-
-	var req RequestBody
 	err = json.Unmarshal(b, &req)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
-	var nlu = cerebroCli.UnderstandText(req.Text)
-	var nlg = CallSkill(nlu)
-
-	var resp ResponseBody
-	resp.Vocal = nlg.Sentence
-	json.NewEncoder(w).Encode(resp)
+	return
 }
 
+// TODO: call the skill according to the skill field
 func CallSkill(nlu cerebro.NLU) anima.NLG {
 	if nlu.Skill == "hello" && nlu.Action == "hello" {
 		return anima.NLG{Sentence: "Bonjour"}
