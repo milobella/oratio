@@ -3,14 +3,14 @@ package main
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"milobella/oratio/pkg/anima"
-	"milobella/oratio/pkg/cerebro"
 	"io/ioutil"
 	"log"
+	"milobella/oratio/pkg/anima"
+	"milobella/oratio/pkg/cerebro"
 	"net/http"
 )
 
-var cerebroCli = cerebro.CerebroClient{}
+var cerebroCli = cerebro.Client{}
 
 // fun main()
 func main() {
