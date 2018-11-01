@@ -1,16 +1,16 @@
 package main
 
 import (
-	"./cerebro"
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"gondora/command-center/anima"
+	"milobella/oratio/pkg/anima"
+	"milobella/oratio/pkg/cerebro"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
 
-var c = cerebro.CerebroClient{}
+var cerebroCli = cerebro.CerebroClient{}
 
 // fun main()
 func main() {
@@ -44,7 +44,7 @@ func TextRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var nlu = c.UnderstandText(req.Text)
+	var nlu = cerebroCli.UnderstandText(req.Text)
 	var nlg = CallSkill(nlu)
 
 	var resp ResponseBody
