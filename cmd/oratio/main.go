@@ -2,15 +2,17 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"milobella/oratio/pkg/anima"
 	"milobella/oratio/pkg/cerebro"
 	"net/http"
+	"time"
 )
 
-var cerebroCli = cerebro.Client{}
+var cerebroCli = cerebro.NewClient("http://0.0.0.0", 9444)
 var animaCli = anima.Client{}
 
 // fun main()
@@ -27,7 +29,6 @@ type ResponseBody struct {
     Vocal  	string `json:"vocal,omitempty"`
 }
 
-
 func TextRequest(w http.ResponseWriter, r *http.Request) {
 
 	// Read the request
@@ -38,7 +39,7 @@ func TextRequest(w http.ResponseWriter, r *http.Request) {
 
 	// Execute the processing flow
 	var nlu = cerebroCli.UnderstandText(body.Text)
-	var nlg = CallSkill(nlu)
+	var nlg = CallSphere(nlu)
 	var vox = animaCli.GenerateSentence(nlg)
 
 	// Build the response
@@ -55,10 +56,13 @@ func ReadRequest(r *http.Request) (req RequestBody, err error) {
 	return
 }
 
-// TODO: call the skill according to the skill field
-func CallSkill(nlu cerebro.NLU) anima.NLG {
-	if nlu.Skill == "hello" && nlu.Action == "hello" {
+// TODO: call the sphere according to the intent
+func CallSphere(nlu cerebro.NLU) anima.NLG {
+	if nlu.Intent == "HELLO"{
 		return anima.NLG{Sentence: "Bonjour"}
 	}
-	return anima.NLG{Sentence: "Erreur"}
+	if nlu.Intent == "GET_TIME"{
+		return anima.NLG{Sentence: fmt.Sprintf("Il est %d heures %d", time.Now().Hour(), time.Now().Minute())}
+	}
+	return anima.NLG{Sentence: "Oups !"}
 }
