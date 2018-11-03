@@ -13,7 +13,7 @@ import (
 )
 
 var cerebroCli = cerebro.NewClient("http://0.0.0.0", 9444)
-var animaCli = anima.Client{}
+var animaCli = anima.NewClient("http://0.0.0.0", 9333)
 
 // fun main()
 func main() {
@@ -59,10 +59,11 @@ func ReadRequest(r *http.Request) (req RequestBody, err error) {
 // TODO: call the sphere according to the intent
 func CallSphere(nlu cerebro.NLU) anima.NLG {
 	if nlu.Intent == "HELLO"{
-		return anima.NLG{Sentence: "Bonjour"}
+		return anima.NLG{Sentence: "Hello"}
 	}
-	if nlu.Intent == "GET_TIME"{
-		return anima.NLG{Sentence: fmt.Sprintf("Il est %d heures %d", time.Now().Hour(), time.Now().Minute())}
+	if nlu.Intent == "GET_TIME" {
+		timeVal := fmt.Sprintf("%d h %d", time.Now().Hour(), time.Now().Minute())
+		return anima.NLG{Sentence: "It is {{time}}", Params: map[string]string{"time": timeVal}}
 	}
 	return anima.NLG{Sentence: "Oups !"}
 }
