@@ -58,7 +58,7 @@ func (c Client) makeRequest(request ability.Request) (response ability.Response,
 	return
 }
 
-func (c Client) CallAbility(nlu cerebro.NLU) (nlg anima.NLG) {
+func (c Client) CallAbility(nlu cerebro.NLU) (nlg anima.NLG, visu interface{}) {
 	request := ability.Request{Nlu: nlu}
 	result, err := c.makeRequest(request)
 	if err != nil {
@@ -68,5 +68,6 @@ func (c Client) CallAbility(nlu cerebro.NLU) (nlg anima.NLG) {
 	}
 
 	nlg = result.Nlg
+	visu = result.Visu
 	return
 }

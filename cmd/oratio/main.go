@@ -29,7 +29,8 @@ type RequestBody struct {
 }
 
 type ResponseBody struct {
-    Vocal  	string `json:"vocal,omitempty"`
+    Vocal  	string 			`json:"vocal,omitempty"`
+    Visu 	interface{} 	`json:"visu,omitempty"`
 }
 
 func TextRequest(w http.ResponseWriter, r *http.Request) {
@@ -41,12 +42,12 @@ func TextRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Execute the processing flow
-	var nlu = cerebroCli.UnderstandText(body.Text)
-	var nlg = CallAbility(nlu)
-	var vox = animaCli.GenerateSentence(nlg)
+	nlu := cerebroCli.UnderstandText(body.Text)
+	nlg, visu := CallAbility(nlu)
+	vocal := animaCli.GenerateSentence(nlg)
 
 	// Build the response
-	json.NewEncoder(w).Encode(ResponseBody{Vocal: vox})
+	json.NewEncoder(w).Encode(ResponseBody{Vocal: vocal, Visu: visu})
 }
 
 func ReadRequest(r *http.Request) (req RequestBody, err error) {
@@ -59,21 +60,21 @@ func ReadRequest(r *http.Request) (req RequestBody, err error) {
 	return
 }
 
-func CallAbility(nlu cerebro.NLU) anima.NLG {
+func CallAbility(nlu cerebro.NLU) (nlg anima.NLG, visu interface{}) {
 	// TODO put personal request in anima
 	if nlu.Intent == "HELLO"{
-		return anima.NLG{Sentence: "Hello"}
+		return anima.NLG{Sentence: "Hello"}, nil
 	}
 
 	// TODO put time request in clock ability
 	if nlu.Intent == "GET_TIME" {
 		timeVal := fmt.Sprintf("%d h %d", time.Now().Hour(), time.Now().Minute())
-		return anima.NLG{Sentence: "It is {{time}}", Params: map[string]string{"time": timeVal}}
+		return anima.NLG{Sentence: "It is {{time}}", Params: map[string]string{"time": timeVal}}, nil
 	}
 
 	if nlu.Intent == "LAST_SHOWTIME" {
 		return cinemaCli.CallAbility(nlu)
 	}
 
-	return anima.NLG{Sentence: "Oups !"}
+	return anima.NLG{Sentence: "Oups !"}, nil
 }
