@@ -19,7 +19,7 @@ var animaCli = anima.NewClient("http://0.0.0.0", 9333)
 func main() {
     router := mux.NewRouter()
     router.HandleFunc("/talk/text", TextRequest).Methods("POST")
-    log.Fatal(http.ListenAndServe(":8000", router))
+    log.Fatal(http.ListenAndServe(":9100", router))
 }
 
 type RequestBody struct {
