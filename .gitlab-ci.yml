@@ -1,5 +1,5 @@
-
 build_image:
+  image: docker:latest
   variables:
     VERSION: $(cat .version)
   script:
