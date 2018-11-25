@@ -1,0 +1,11 @@
+before_script:
+  - docker info
+
+build_image:
+  variables:
+    VERSION: $(cat .version)
+  script:
+    - docker build -t milobella/oratio:$VERSION
+      --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+      --build-arg VCS_REF=master
+      --build-arg BUILD_VERSION=$VERSION
