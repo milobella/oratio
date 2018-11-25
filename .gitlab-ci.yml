@@ -7,3 +7,4 @@ build_image:
       --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
       --build-arg VCS_REF=master
       --build-arg BUILD_VERSION=$VERSION
+  tags: [milobella]
