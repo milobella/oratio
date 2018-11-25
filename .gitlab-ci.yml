@@ -1,8 +1,7 @@
 build_image:
   image: docker:latest
-  variables:
-    VERSION: $(cat .version)
   script:
+    - export VERSION=$(cat .version)
     - docker build -t milobella/oratio:$VERSION
       --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
       --build-arg VCS_REF=master
