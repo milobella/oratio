@@ -1,3 +1,8 @@
+image: docker:stable
+
+before_script:
+  - docker info
+
 build_image:
   script:
     - export VERSION=$(cat VERSION.txt)
@@ -6,4 +11,4 @@ build_image:
       --build-arg VCS_REF=master
       --build-arg BUILD_VERSION=$VERSION
       .
-  tags: [shell,milobella]
+  tags: [docker,milobella]
