@@ -3,4 +3,3 @@ Dockerfile
 .git
 bin
 vendor
-private
