@@ -42,7 +42,11 @@ RUN dep ensure
 RUN go build -o /bin/main cmd/oratio/main.go
 
 # Clean step (necessary for security and size considerations)
-RUN rm -r /root/.ssh && rm /root/.gitconfig && rm -r $GOPATH_SOURCES 
+RUN cd /
+RUN rm -rf /root/.ssh
+RUN rm /root/.gitconfig
+RUN ls -l $GOPATH_SOURCES
+RUN rm -rf $GOPATH_SOURCES 
 
 #  Build the main command 
 CMD /bin/main
