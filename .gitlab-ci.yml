@@ -28,6 +28,7 @@ before_script:
 
 build_image:
   script:
+    - mkdir -p private
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
     - export VERSION=$(cat VERSION.txt)
     - docker build -t milobella/oratio:$VERSION
