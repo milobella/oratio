@@ -6,6 +6,7 @@ build_image:
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
     - export VERSION=$(cat VERSION.txt)
     - docker build -t milobella/oratio:$VERSION
+      --add-host gitlab.milobella.com:192.168.1.15
       --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
       --build-arg VCS_REF=master
       --build-arg BUILD_VERSION=$VERSION
