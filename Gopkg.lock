@@ -18,6 +18,22 @@
   version = "v1.6.2"
 
 [[projects]]
+  digest = "1:95741de3af260a92cc5c7f3f3061e85273f5a81b5db20d4bd68da74bd521675e"
+  name = "github.com/pelletier/go-toml"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
+  version = "v1.2.0"
+
+[[projects]]
+  digest = "1:b51d7f60b923aaa5d28e71b28ab8a2f374ad3b80c0edf20c9e6a08a5c938c88d"
+  name = "github.com/stevenroose/gonfig"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "e459e03044df1de4df89c5be71deaac7718b0909"
+  version = "v0.1.1"
+
+[[projects]]
   branch = "master"
   digest = "1:818e0dfb0a3eb05099128b5b8a0ce184bc9792294176659082f52f003552f4a7"
   name = "gitlab.milobella.com/milobella/ability-sdk-go"
@@ -26,11 +42,31 @@
   revision = "0eb4c71d36144aa9f65306d35d77c92de91a4d20"
   source = "https://gitlab.milobella.com/milobella/abilities/ability-sdk-go.git"
 
+[[projects]]
+  branch = "master"
+  digest = "1:f343f077a5b0bc3a3788b3a04e24dd417e3e25b2acb529c413e212d2c42416ef"
+  name = "golang.org/x/sys"
+  packages = [
+    "unix",
+    "windows",
+  ]
+  pruneopts = "UT"
+  revision = "62eef0e2fa9b2c385f7b2778e763486da6880d37"
+
+[[projects]]
+  digest = "1:342378ac4dcb378a5448dd723f0784ae519383532f5e70ade24132c4c8693202"
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
     "github.com/gorilla/mux",
+    "github.com/stevenroose/gonfig",
     "gitlab.milobella.com/milobella/ability-sdk-go/pkg/ability",
   ]
   solver-name = "gps-cdcl"

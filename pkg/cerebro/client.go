@@ -2,10 +2,10 @@ package cerebro
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -17,7 +17,7 @@ type Client struct {
 }
 
 func NewClient(host string, port int) *Client {
-	url := strings.Join([]string{host, strconv.Itoa(port)}, ":")
+	url := fmt.Sprintf("http://%s:%d", host, port)
 	return &Client{host: host, port: port, url: url, client: http.Client{}}
 }
 

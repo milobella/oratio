@@ -1,0 +1,21 @@
+[server]
+port = 9100
+
+[cerebro]
+host = "0.0.0.0"
+port = 9444
+
+[anima]
+host = "0.0.0.0"
+port = 9333
+
+[abilities]
+[abilities.cinema]
+    intents = ["LAST_SHOWTIME"]
+    host = "0.0.0.0"
+    port = 10200
+
+#[abilities.clock]
+#    intents = ["GET_TIME"]
+#    host = "0.0.0.0"
+#    port = 10300
