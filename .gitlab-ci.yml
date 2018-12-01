@@ -5,5 +5,5 @@ build_image:
     # Write the id_rsa private key into the good path
     - mkdir -p private && echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
     # Run the docker build script
-    - ./scripts/docker_build.sh
+    - bash scripts/docker_build.sh
   tags: [docker,milobella]
