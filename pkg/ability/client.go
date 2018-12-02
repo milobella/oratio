@@ -3,13 +3,13 @@ package ability
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"gitlab.milobella.com/milobella/ability-sdk-go/pkg/ability"
 	"gitlab.milobella.com/milobella/oratio/pkg/anima"
 	"gitlab.milobella.com/milobella/oratio/pkg/cerebro"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -21,7 +21,7 @@ type Client struct {
 }
 
 func NewClient(host string, port int) *Client {
-	url := strings.Join([]string{host, strconv.Itoa(port)}, ":")
+	url := fmt.Sprintf("http://%s:%d", host, port)
 	return &Client{host: host, port: port, url: url, client: http.Client{}}
 }
 

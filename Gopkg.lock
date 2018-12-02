@@ -2,6 +2,25 @@
 
 
 [[projects]]
+  branch = "master"
+  digest = "1:315c5f2f60c76d89b871c73f9bd5fe689cad96597afd50fb9992228ef80bdd34"
+  name = "github.com/alecthomas/template"
+  packages = [
+    ".",
+    "parse",
+  ]
+  pruneopts = "UT"
+  revision = "a0175ee3bccc567396460bf5acd36800cb10c49c"
+
+[[projects]]
+  branch = "master"
+  digest = "1:c198fdc381e898e8fb62b8eb62758195091c313ad18e52a3067366e1dda2fb3c"
+  name = "github.com/alecthomas/units"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
+
+[[projects]]
   digest = "1:c79fb010be38a59d657c48c6ba1d003a8aa651fa56b579d959d74573b7dff8e1"
   name = "github.com/gorilla/context"
   packages = ["."]
@@ -19,6 +38,54 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:a330103bc9731260ee9fa14764e9e3fce46e02de19d6aca3eeba1d425badfbf0"
+  name = "github.com/juju/loggo"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "584905176618da46b895b176c721b02c476b6993"
+
+[[projects]]
+  digest = "1:0a69a1c0db3591fcefb47f115b224592c8dfa4368b7ba9fae509d5e16cdc95c8"
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
+  version = "v1.0.1"
+
+[[projects]]
+  digest = "1:95741de3af260a92cc5c7f3f3061e85273f5a81b5db20d4bd68da74bd521675e"
+  name = "github.com/pelletier/go-toml"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
+  version = "v1.2.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:c47550d71ea17823202a58abc3f635da0a341284342e64fb0d1a95a4cf790301"
+  name = "github.com/prometheus/common"
+  packages = ["log"]
+  pruneopts = "UT"
+  revision = "4724e9255275ce38f7179b2478abeae4e28c904f"
+
+[[projects]]
+  digest = "1:69b1cc331fca23d702bd72f860c6a647afd0aa9fcbc1d0659b1365e26546dd70"
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "bcd833dfe83d3cebad139e4a29ed79cb2318bf95"
+  version = "v1.2.0"
+
+[[projects]]
+  digest = "1:b51d7f60b923aaa5d28e71b28ab8a2f374ad3b80c0edf20c9e6a08a5c938c88d"
+  name = "github.com/stevenroose/gonfig"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "e459e03044df1de4df89c5be71deaac7718b0909"
+  version = "v0.1.1"
+
+[[projects]]
+  branch = "master"
   digest = "1:818e0dfb0a3eb05099128b5b8a0ce184bc9792294176659082f52f003552f4a7"
   name = "gitlab.milobella.com/milobella/ability-sdk-go"
   packages = ["pkg/ability"]
@@ -26,11 +93,51 @@
   revision = "0eb4c71d36144aa9f65306d35d77c92de91a4d20"
   source = "https://gitlab.milobella.com/milobella/abilities/ability-sdk-go.git"
 
+[[projects]]
+  branch = "master"
+  digest = "1:38f553aff0273ad6f367cb0a0f8b6eecbaef8dc6cb8b50e57b6a81c1d5b1e332"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  pruneopts = "UT"
+  revision = "eb0de9b17e854e9b1ccd9963efafc79862359959"
+
+[[projects]]
+  branch = "master"
+  digest = "1:ea82adb0e58f9f0d6b02b69611e4034dc74fbecfe692d63a4e2372bd5d9d975b"
+  name = "golang.org/x/sys"
+  packages = [
+    "unix",
+    "windows",
+    "windows/registry",
+    "windows/svc/eventlog",
+  ]
+  pruneopts = "UT"
+  revision = "62eef0e2fa9b2c385f7b2778e763486da6880d37"
+
+[[projects]]
+  digest = "1:c06d9e11d955af78ac3bbb26bd02e01d2f61f689e1a3bce2ef6fb683ef8a7f2d"
+  name = "gopkg.in/alecthomas/kingpin.v2"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "947dcec5ba9c011838740e680966fd7087a71d0d"
+  version = "v2.2.6"
+
+[[projects]]
+  digest = "1:342378ac4dcb378a5448dd723f0784ae519383532f5e70ade24132c4c8693202"
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
     "github.com/gorilla/mux",
+    "github.com/juju/loggo",
+    "github.com/prometheus/common/log",
+    "github.com/stevenroose/gonfig",
     "gitlab.milobella.com/milobella/ability-sdk-go/pkg/ability",
   ]
   solver-name = "gps-cdcl"
