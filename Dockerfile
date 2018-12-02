@@ -40,13 +40,13 @@ RUN chmod 700 /root/.ssh/id_rsa
 # Install dependencies using the private RSA key
 RUN dep ensure
 RUN go build -o /bin/main cmd/$MODULE_NAME/main.go
+ENV CONFIGURATION_PATH=/etc/$MODULE_NAME.toml
+RUN cp config/$MODULE_NAME.toml ${CONFIGURATION_PATH}
 
-# Clean step (necessary for security and size considerations)
+# Clean step (necessary for security considerations)
 WORKDIR /
 RUN rm -rf /root/.ssh
 RUN rm /root/.gitconfig
-RUN ls -l $GOPATH_SOURCES
-RUN rm -rf $GOPATH_SOURCES 
 
 # Build the main command
-CMD /bin/main -c config/$MODULE_NAME.conf
+CMD /bin/main --configfile ${CONFIGURATION_PATH}

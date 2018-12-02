@@ -1,5 +1,6 @@
 [server]
 port = 9100
+log_level = "<root>=INFO"
 
 [cerebro]
 host = "0.0.0.0"

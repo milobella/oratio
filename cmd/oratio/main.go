@@ -4,25 +4,36 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/juju/loggo"
+	"github.com/prometheus/common/log"
 	"github.com/stevenroose/gonfig"
 	"gitlab.milobella.com/milobella/oratio/internal/config"
 	"gitlab.milobella.com/milobella/oratio/pkg/ability"
 	"gitlab.milobella.com/milobella/oratio/pkg/anima"
 	"gitlab.milobella.com/milobella/oratio/pkg/cerebro"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"time"
 )
 
-var conf = struct{
+type Configuration struct {
 	Server 		config.ServerConfiguration
 	Cerebro 	config.CerebroConfiguration
 	Anima 		config.AnimaConfiguration
-	Abilities 	map[string]config.AbilityConfiguration
+	Abilities 	map[string]interface{}
 	ConfigFile 	string `short:"c"`
-}{}
+}
+
+func (c Configuration) String() string {
+	b, err := json.Marshal(c)
+	if err != nil {
+		log.Fatal("Configuration serialization error %s", err)
+	}
+	return string(b)
+}
+
+var conf *Configuration
 
 var cerebroClient *cerebro.Client
 var animaClient *anima.Client
@@ -30,8 +41,11 @@ var abilityClientsMap map[string]*ability.Client
 
 // fun main()
 func main() {
+
+	conf = &Configuration{}
+
 	// Load the configuration from file or parameter or env
-	err := gonfig.Load(&conf, gonfig.Conf{
+	err := gonfig.Load(conf, gonfig.Conf{
 		ConfigFileVariable: "configfile", // enables passing --configfile myfile.conf
 
 		FileDefaultFilename: "config/oratio.toml",
@@ -39,17 +53,27 @@ func main() {
 
 		EnvPrefix: "ORATIO_",
 	})
+
+	logger := loggo.GetLogger("oratio.main")
 	if err != nil {
-		log.Fatalf("Error reading config : %s", err)
+		loggo.ConfigureLoggers("<root>=INFO")
+		logger.Criticalf("Error reading config : %s", err)
+	} else {
+		loggo.ConfigureLoggers(conf.Server.LogLevel)
+		logger.Infof("Successfully readen configuration file : %s", conf.ConfigFile)
+		logger.Debugf("-> %+v", conf)
 	}
 
 	// Initialize clients
 	cerebroClient = cerebro.NewClient(conf.Cerebro.Host, conf.Cerebro.Port)
 	animaClient = anima.NewClient(conf.Anima.Host, conf.Anima.Port)
+	abilityClientsMap = make(map[string]*ability.Client)
+	// TODO: refactor this code
 	for _, abilityConfig := range conf.Abilities {
-		abilityClient := ability.NewClient(abilityConfig.Host, abilityConfig.Port)
-		for _, intent := range abilityConfig.Intents {
-			abilityClientsMap[intent] = abilityClient
+		ac := abilityConfig.(map[string]interface {})
+		abilityClient := ability.NewClient(ac["host"].(string), int(ac["port"].(int64)))
+		for _, intent := range ac["intents"].([]interface{}) {
+			abilityClientsMap[intent.(string)] = abilityClient
 		}
 	}
 
@@ -58,16 +82,16 @@ func main() {
 	router.HandleFunc("/talk/text", textRequest).Methods("POST")
 
 	// Initializing the server
-	addr := fmt.Sprintf(":%d", conf.Server.Port)
+	addr := fmt.Sprintf(":%d", 8080)
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
-		log.Fatalf("Error initializing the server : %s", err)
+		logger.Criticalf("Error initializing the server : %s", err)
 	}
 
 	// Start the server
 	done := make(chan bool)
 	go http.Serve(listener, router)
-	log.Printf("Successfully started the Milobella::Oratio server on port %d !", conf.Server.Port)
+	logger.Infof("Successfully started the Milobella::Oratio server on port %d !", conf.Server.Port)
 	<-done
 }
 
