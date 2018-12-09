@@ -18,11 +18,11 @@ import (
 )
 
 type Configuration struct {
-	Server 		config.ServerConfiguration
-	Cerebro 	config.CerebroConfiguration
-	Anima 		config.AnimaConfiguration
-	Abilities 	map[string]interface{}
-	ConfigFile 	string `short:"c"`
+	Server     config.ServerConfiguration
+	Cerebro    config.CerebroConfiguration
+	Anima      config.AnimaConfiguration
+	Abilities  map[string]interface{}
+	ConfigFile string `short:"c"`
 }
 
 func (c Configuration) String() string {
@@ -49,7 +49,7 @@ func main() {
 		ConfigFileVariable: "configfile", // enables passing --configfile myfile.conf
 
 		FileDefaultFilename: "config/oratio.toml",
-		FileDecoder: gonfig.DecoderTOML,
+		FileDecoder:         gonfig.DecoderTOML,
 
 		EnvPrefix: "ORATIO_",
 	})
@@ -70,7 +70,7 @@ func main() {
 	abilityClientsMap = make(map[string]*ability.Client)
 	// TODO: refactor this code
 	for _, abilityConfig := range conf.Abilities {
-		ac := abilityConfig.(map[string]interface {})
+		ac := abilityConfig.(map[string]interface{})
 		abilityClient := ability.NewClient(ac["host"].(string), int(ac["port"].(int64)))
 		for _, intent := range ac["intents"].([]interface{}) {
 			abilityClientsMap[intent.(string)] = abilityClient
@@ -82,7 +82,7 @@ func main() {
 	router.HandleFunc("/talk/text", textRequest).Methods("POST")
 
 	// Initializing the server
-	addr := fmt.Sprintf(":%d", 8080)
+	addr := fmt.Sprintf(":%d", conf.Server.Port)
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		logger.Criticalf("Error initializing the server : %s", err)
@@ -96,12 +96,12 @@ func main() {
 }
 
 type RequestBody struct {
-    Text 	string   `json:"text,omitempty"`
+	Text string `json:"text,omitempty"`
 }
 
 type ResponseBody struct {
-    Vocal  	string 			`json:"vocal,omitempty"`
-    Visu 	interface{} 	`json:"visu,omitempty"`
+	Vocal string      `json:"vocal,omitempty"`
+	Visu  interface{} `json:"visu,omitempty"`
 }
 
 func textRequest(w http.ResponseWriter, r *http.Request) {
@@ -134,17 +134,23 @@ func readRequest(r *http.Request) (req RequestBody, err error) {
 // Choose what ability to call according to the intent resolved by cerebro.
 func callAbility(nlu cerebro.NLU) (nlg anima.NLG, visu interface{}) {
 	// TODO put personal request in anima
-	if nlu.Intent == "HELLO"{
+	if nlu.BestIntent == "HELLO" {
 		return anima.NLG{Sentence: "Hello"}, nil
 	}
 
 	// TODO put time request in clock ability
-	if nlu.Intent == "GET_TIME" {
+	if nlu.BestIntent == "GET_TIME" {
 		timeVal := fmt.Sprintf("%d h %d", time.Now().Hour(), time.Now().Minute())
-		return anima.NLG{Sentence: "It is {{time}}", Params: map[string]string{"time": timeVal}}, nil
+		return anima.NLG{
+			Sentence: "It is {{time}}",
+			Params: []anima.NLGParam{{
+				Name:  "time",
+				Value: timeVal,
+				Type:  "time",
+			}}}, nil
 	}
 
-	if client, ok := abilityClientsMap[nlu.Intent]; ok {
+	if client, ok := abilityClientsMap[nlu.BestIntent]; ok {
 		return client.CallAbility(nlu)
 	}
 

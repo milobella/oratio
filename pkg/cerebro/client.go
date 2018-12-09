@@ -21,29 +21,28 @@ func NewClient(host string, port int) *Client {
 	return &Client{host: host, port: port, url: url, client: http.Client{}}
 }
 
-func (c Client) UnderstandText(t string) (nlu NLU) {
+func (c Client) UnderstandText(t string) (result NLU) {
 	result, err := c.makeRequest(t)
 	if err != nil {
-		nlu.Intent = "error"
+		result.BestIntent = "error"
 		return
 	}
 
-	nlu.Intent = c.interpretIntent(result)
+	c.bestNLU(&result)
 	return
 }
 
-func (c Client) interpretIntent(result map[string]float32) (best string) {
+func (c Client) bestNLU(result *NLU) {
 	var bestScore float32 = 0
-	for category, score := range result {
-		if score > bestScore {
-			best = category
-			bestScore = score
+	for _, intent := range result.Intents {
+		if intent.Score > bestScore {
+			result.BestIntent = intent.Label
+			bestScore = intent.Score
 		}
 	}
-	return
 }
 
-func (c Client) makeRequest(query string) (result map[string]float32, err error) {
+func (c Client) makeRequest(query string) (result NLU, err error) {
 	understandEndpoint := strings.Join([]string{c.url, "understand"}, "/")
 	req, err := http.NewRequest("GET", understandEndpoint, nil)
 	if err != nil {

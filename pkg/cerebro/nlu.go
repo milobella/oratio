@@ -1,6 +1,17 @@
 package cerebro
 
 type NLU struct {
-	Intent    string   `json:"action,omitempty"`
-	Parameter []string `json:"parameter,omitempty"`
+	BestIntent string
+	Intents    []Intent
+	Entities   []Entity
+}
+
+type Intent struct {
+	Label string
+	Score float32
+}
+
+type Entity struct {
+	Label string
+	Text  string
 }

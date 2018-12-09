@@ -26,13 +26,13 @@ func NewClient(host string, port int) *Client {
 }
 
 func (c Client) makeRequest(request ability.Request) (response ability.Response, err error) {
-	restituteEndpoint := strings.Join([]string{c.url, "resolve", request.Nlu.Intent}, "/")
-	jsonNLG, err := json.Marshal(request)
+	endpoint := strings.Join([]string{c.url, "resolve", request.Nlu.BestIntent}, "/")
+	postBody, err := json.Marshal(request)
 	if err != nil {
 		log.Print(err)
 		return
 	}
-	req, err := http.NewRequest("POST", restituteEndpoint, bytes.NewBuffer(jsonNLG))
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(postBody))
 	if err != nil {
 		log.Print(err)
 		return

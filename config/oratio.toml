@@ -20,3 +20,8 @@ port = 9333
 #    intents = ["GET_TIME"]
 #    host = "0.0.0.0"
 #    port = 10300
+
+[abilities.shoppinglist]
+    intents = ["ADD_TO_LIST"]
+    host = "0.0.0.0"
+    port = 10400
