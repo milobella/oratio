@@ -4,6 +4,9 @@ stages:
   - build
   - deploy
 
+variables:
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+
 build_image:
   stage: build
   script:
@@ -11,9 +14,11 @@ build_image:
     - mkdir -p private && echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
     # Run the docker build script
     - sh scripts/docker_build.sh
+    - echo $IMAGE_TAG
   tags: [docker,milobella]
 
 deploy_image:
   stage: deploy
   script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - sh scripts/docker_push.sh
