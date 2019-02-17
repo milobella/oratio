@@ -5,9 +5,12 @@ stages:
   - deploy
 
 include:
-- project: 'milobella/devops/ci-templates'
-  ref: master
-  file: '/templates/Milobella-Docker.gitlab-ci.yml'
+- remote: 'https://gitlab.milobella.com/milobella/ci-templates/ci-templates/raw/master/templates/Milobella-Docker.gitlab-ci.yml'
+
+#include:
+#- project: 'milobella/devops/ci-templates'
+#  ref: master
+#  file: '/templates/Milobella-Docker.gitlab-ci.yml'
 
 build:
   stage: build
