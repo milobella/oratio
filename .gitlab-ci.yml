@@ -6,9 +6,8 @@ stages:
 
 .milobella_docker_build: &milobella_docker_build
   script:
-    - # Write the id_rsa private key into the good path
+    # Write the id_rsa private key into the good path
     - mkdir -p private && echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
-#    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker build -t ${IMAGE} --add-host ${GITLAB_HOST}:192.168.1.15
       --build-arg BUILD_VERSION=$(cat VERSION.txt)
       --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
@@ -19,7 +18,6 @@ stages:
       --build-arg VCS_REF=master
       --build-arg SSH_RSA_KEY=${LOCAL_PRIVATE_RSA_KEY}
       .
-#    - docker push $CI_REGISTRY_IMAGE:$(cat VERSION.txt)
   tags: [docker,milobella]
 
 
