@@ -2,15 +2,14 @@ image: docker:stable
 
 stages:
   - build
-  - deploy
+  - release
 
-include:
-- remote: 'https://gitlab.milobella.com/milobella/ci-templates/ci-templates/raw/master/templates/Milobella-Docker.gitlab-ci.yml'
+variables:
+  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  CONTAINER_LATEST_IMAGE: $CI_REGISTRY_IMAGE:latest
 
-#include:
-#- project: 'milobella/devops/ci-templates'
-#  ref: master
-#  file: '/templates/Milobella-Docker.gitlab-ci.yml'
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
 
 build:
   stage: build
@@ -32,13 +31,16 @@ build:
     --build-arg VCS_REF=master
     --build-arg SSH_RSA_KEY=private/id_rsa
     .
+  - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   tags: [docker,milobella]
 
-build2:
-  extends: .milobella_docker_build
-  stage: build
-  variables:
-    MODULE_DESCRIPTION: "Http server which is the main and only entry point of Milobella."
-#  script:
-#    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-#    - docker push $CI_REGISTRY_IMAGE:$(cat VERSION.txt)
+release-image:
+  stage: release
+  script:
+    - docker pull $CONTAINER_TEST_IMAGE
+    - docker tag $CONTAINER_TEST_IMAGE CONTAINER_LATEST_IMAGE
+    - docker tag $CONTAINER_TEST_IMAGE $CI_REGISTRY_IMAGE:$(cat VERSION.txt)
+    - docker push CONTAINER_LATEST_IMAGE
+    - docker push $CI_REGISTRY_IMAGE:$(cat VERSION.txt)
+  tags: [docker,milobella]
+
