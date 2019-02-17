@@ -21,7 +21,7 @@ build:
   script:
   # Write the id_rsa private key into the good path
   - mkdir -p private && echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
-  - docker build -t $CI_REGISTRY_IMAGE:$(cat VERSION.txt) --add-host ${GITLAB_HOST}:192.168.1.15
+  - docker build -t CONTAINER_TEST_IMAGE --add-host ${GITLAB_HOST}:192.168.1.15
     --build-arg BUILD_VERSION=$(cat VERSION.txt)
     --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
     --build-arg GITLAB_HOST=${GITLAB_HOST}
@@ -31,16 +31,17 @@ build:
     --build-arg VCS_REF=master
     --build-arg SSH_RSA_KEY=private/id_rsa
     .
-  - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  - docker push CONTAINER_TEST_IMAGE
   tags: [docker,milobella]
 
 release-image:
   stage: release
   script:
     - docker pull $CONTAINER_TEST_IMAGE
-    - docker tag $CONTAINER_TEST_IMAGE CONTAINER_LATEST_IMAGE
+    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_LATEST_IMAGE
     - docker tag $CONTAINER_TEST_IMAGE $CI_REGISTRY_IMAGE:$(cat VERSION.txt)
     - docker push CONTAINER_LATEST_IMAGE
     - docker push $CI_REGISTRY_IMAGE:$(cat VERSION.txt)
   tags: [docker,milobella]
+  only: [master]
 
