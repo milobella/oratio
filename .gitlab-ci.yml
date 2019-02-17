@@ -9,23 +9,33 @@ include:
   ref: master
   file: '/templates/Milobella-Docker.gitlab-ci.yml'
 
-#.milobella_docker_deploy: &milobella_docker_deploy
-#  stage: deploy
+build:
+  stage: build
+  variables:
+    PROJECT_NAME: "milobella"
+    MODULE_NAME: ${CI_PROJECT_NAME}
+    GITLAB_HOST: "gitlab.milobella.com"
+    MODULE_DESCRIPTION: "Http server which is the main and only entry point of Milobella."
+  script:
+  # Write the id_rsa private key into the good path
+  - mkdir -p private && echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
+  - docker build -t $CI_REGISTRY_IMAGE:$(cat VERSION.txt) --add-host ${GITLAB_HOST}:192.168.1.15
+    --build-arg BUILD_VERSION=$(cat VERSION.txt)
+    --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+    --build-arg GITLAB_HOST=${GITLAB_HOST}
+    --build-arg PROJECT_NAME=${PROJECT_NAME}
+    --build-arg MODULE_NAME=${MODULE_NAME}
+    --build-arg MODULE_DESCRIPTION=${MODULE_DESCRIPTION}
+    --build-arg VCS_REF=master
+    --build-arg SSH_RSA_KEY=private/id_rsa
+    .
+  tags: [docker,milobella]
+
+build2:
+  extends: .milobella_docker_build
+  stage: build
+  variables:
+    MODULE_DESCRIPTION: "Http server which is the main and only entry point of Milobella."
 #  script:
 #    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
 #    - docker push $CI_REGISTRY_IMAGE:$(cat VERSION.txt)
-
-variables:
-  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-
-build_image:
-  <<: *milobella_docker_build
-  variables:
-    MODULE_DESCRIPTION = "Http server which is the main and only entry point of Milobella."
-  stage: build
-
-#deploy_image:
-#  stage: deploy
-#  script:
-#
-#    - sh scripts/docker_push.sh
