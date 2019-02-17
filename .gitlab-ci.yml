@@ -1,9 +1,19 @@
 image: docker:stable
 
+stages:
+  - build
+  - deploy
+
 build_image:
+  stage: build
   script:
     # Write the id_rsa private key into the good path
     - mkdir -p private && echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
     # Run the docker build script
-    - sh scripts/docker_build.sh
+    - bash scripts/docker_build.sh
   tags: [docker,milobella]
+
+deploy_image:
+  stage: deploy
+  script:
+    - bash scripts/docker_push.sh
