@@ -4,21 +4,40 @@ stages:
   - build
   - deploy
 
+.milobella_docker_build: &milobella_docker_build
+  script:
+    - # Write the id_rsa private key into the good path
+    - mkdir -p private && echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
+#    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -t ${IMAGE} --add-host ${GITLAB_HOST}:192.168.1.15
+      --build-arg BUILD_VERSION=$(cat VERSION.txt)
+      --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+      --build-arg GITLAB_HOST="gitlab.milobella.com"
+      --build-arg PROJECT_NAME="milobella"
+      --build-arg MODULE_NAME=${CI_PROJECT_NAME}
+      --build-arg MODULE_DESCRIPTION="Http server which is the main and only entry point of Milobella."
+      --build-arg VCS_REF=master
+      --build-arg SSH_RSA_KEY=${LOCAL_PRIVATE_RSA_KEY}
+      .
+#    - docker push $CI_REGISTRY_IMAGE:$(cat VERSION.txt)
+  tags: [docker,milobella]
+
+
+#.milobella_docker_deploy: &milobella_docker_deploy
+#  stage: deploy
+#  script:
+#    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+#    - docker push $CI_REGISTRY_IMAGE:$(cat VERSION.txt)
+
 variables:
   IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
 
 build_image:
+  <<: *milobella_docker_build
   stage: build
-  script:
-    # Write the id_rsa private key into the good path
-    - mkdir -p private && echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
-    # Run the docker build script
-    - sh scripts/docker_build.sh
-    - echo $IMAGE_TAG
-  tags: [docker,milobella]
 
-deploy_image:
-  stage: deploy
-  script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - sh scripts/docker_push.sh
+#deploy_image:
+#  stage: deploy
+#  script:
+#
+#    - sh scripts/docker_push.sh
