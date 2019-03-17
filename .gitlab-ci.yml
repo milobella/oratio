@@ -21,6 +21,7 @@ build:
   script:
   # Write the id_rsa private key into the good path
   - mkdir -p private && echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
+  - echo "$CI_REGISTRY  $CI_REGISTRY_IMAGE"
   - docker build -t $CONTAINER_TEST_IMAGE --add-host ${GITLAB_HOST}:192.168.1.15
     --build-arg BUILD_VERSION=$(cat VERSION.txt)
     --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
