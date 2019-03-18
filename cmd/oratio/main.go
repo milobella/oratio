@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/juju/loggo"
 	"github.com/prometheus/common/log"
-	"github.com/stevenroose/gonfig"
+	"github.com/celian-garcia/gonfig"
 	"gitlab.milobella.com/milobella/oratio/internal/config"
 	"gitlab.milobella.com/milobella/oratio/pkg/ability"
 	"gitlab.milobella.com/milobella/oratio/pkg/anima"
@@ -21,7 +21,7 @@ type Configuration struct {
 	Server     config.ServerConfiguration
 	Cerebro    config.CerebroConfiguration
 	Anima      config.AnimaConfiguration
-	Abilities  map[string]interface{}
+	Abilities  []config.AbilityConfiguration
 	ConfigFile string `short:"c"`
 }
 
@@ -68,12 +68,11 @@ func main() {
 	cerebroClient = cerebro.NewClient(conf.Cerebro.Host, conf.Cerebro.Port)
 	animaClient = anima.NewClient(conf.Anima.Host, conf.Anima.Port)
 	abilityClientsMap = make(map[string]*ability.Client)
-	// TODO: refactor this code
-	for _, abilityConfig := range conf.Abilities {
-		ac := abilityConfig.(map[string]interface{})
-		abilityClient := ability.NewClient(ac["host"].(string), int(ac["port"].(int64)))
-		for _, intent := range ac["intents"].([]interface{}) {
-			abilityClientsMap[intent.(string)] = abilityClient
+	// TODO: Abilities should be a dynamic data
+	for _, ac := range conf.Abilities {
+		abilityClient := ability.NewClient(ac.Host, ac.Port)
+		for _, intent := range ac.Intents {
+			abilityClientsMap[intent] = abilityClient
 		}
 	}
 

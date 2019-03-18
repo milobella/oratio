@@ -14,3 +14,10 @@ type AnimaConfiguration struct {
 	Host string 	`env:"ANIMA_HOST" default:"localhost"`
 	Port int 		`env:"ANIMA_PORT" default:"9333"`
 }
+
+type AbilityConfiguration struct {
+	Name string
+	Host string
+	Port int
+	Intents []string
+}

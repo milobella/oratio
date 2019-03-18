@@ -10,18 +10,20 @@ port = 9444
 host = "0.0.0.0"
 port = 9333
 
-[abilities]
-[abilities.cinema]
+[[abilities]]
+    name = "cinema"
     intents = ["LAST_SHOWTIME"]
-    host = "0.0.0.0"
+    host = "cinema-ability"
     port = 10200
 
-#[abilities.clock]
+#[[abilities]]
+#    name = "clock"
 #    intents = ["GET_TIME"]
-#    host = "0.0.0.0"
+#    host = "clock-ability"
 #    port = 10300
 
-[abilities.shoppinglist]
+[[abilities]]
+    name = "shoppinglist"
     intents = ["ADD_TO_LIST"]
-    host = "0.0.0.0"
+    host = "shoppinglist-ability"
     port = 10400
