@@ -6,10 +6,13 @@ stages:
 
 variables:
   CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  CONTAINER_LATEST_IMAGE: $CI_REGISTRY_IMAGE:latest
+  DH_REGISTRY_IMAGE: $DOCKER_USER/$CI_PROJECT_NAME
 
 before_script:
+  # Login to gitlab registry
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  # Login to docker hub
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
 
 build:
   stage: build
@@ -38,10 +41,17 @@ release-image:
   stage: release
   script:
     - docker pull $CONTAINER_TEST_IMAGE
-    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_LATEST_IMAGE
+    # Push to docker hub registry
+    - docker tag $CONTAINER_TEST_IMAGE $DH_REGISTRY_IMAGE:latest
+    - docker tag $CONTAINER_TEST_IMAGE $DH_REGISTRY_IMAGE:$(cat VERSION.txt)
+    - docker push $DH_REGISTRY_IMAGE:latest
+    - docker push $DH_REGISTRY_IMAGE:$(cat VERSION.txt)
+    # Push to gitlab registry
+    - docker tag $CONTAINER_TEST_IMAGE $CI_REGISTRY_IMAGE:latest
     - docker tag $CONTAINER_TEST_IMAGE $CI_REGISTRY_IMAGE:$(cat VERSION.txt)
-    - docker push $CONTAINER_LATEST_IMAGE
+    - docker push $CI_REGISTRY_IMAGE:latest
     - docker push $CI_REGISTRY_IMAGE:$(cat VERSION.txt)
   tags: [docker,milobella]
   only: [master]
+
 
