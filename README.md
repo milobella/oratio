@@ -10,5 +10,5 @@ TODO
 
 ## Example of request
 ```bash
-curl -i -X POST http://192.168.99.100:31299/talk/text -d '{"text": "Quelle heure il est ? "}'
+curl -i -X POST http://localhost:9100/talk/text -d '{"text": "Quelle heure il est ? "}'
 ```
