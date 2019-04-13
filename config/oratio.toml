@@ -25,5 +25,5 @@ port = 9333
 [[abilities]]
     name = "shoppinglist"
     intents = ["ADD_TO_LIST"]
-    host = "shoppinglist-ability"
-    port = 10400
+    host = "ability-shoppinglist"
+    port = 4444
