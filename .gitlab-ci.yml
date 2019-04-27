@@ -3,16 +3,11 @@ image: docker:stable
 stages:
   - build
   - release
+  - deploy
 
 variables:
   CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   DH_REGISTRY_IMAGE: $DOCKER_USER/$CI_PROJECT_NAME
-
-before_script:
-  # Login to gitlab registry
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  # Login to docker hub
-  - docker login -u $DOCKER_USER -p $DOCKER_PASS
 
 build:
   stage: build
@@ -21,37 +16,67 @@ build:
     MODULE_NAME: ${CI_PROJECT_NAME}
     GITLAB_HOST: "gitlab.milobella.com"
     MODULE_DESCRIPTION: "Http server which is the main and only entry point of Milobella."
+  before_script:
+    - export APP_VERSION=$(cat VERSION.txt)
+    # Login to gitlab registry
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
-  # Write the id_rsa private key into the good path
-  - mkdir -p private && echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
-  - docker build -t $CONTAINER_TEST_IMAGE --add-host ${GITLAB_HOST}:192.168.1.15
-    --build-arg BUILD_VERSION=$(cat VERSION.txt)
-    --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-    --build-arg GITLAB_HOST=${GITLAB_HOST}
-    --build-arg PROJECT_NAME=${PROJECT_NAME}
-    --build-arg MODULE_NAME=${MODULE_NAME}
-    --build-arg MODULE_DESCRIPTION="${MODULE_DESCRIPTION}"
-    --build-arg VCS_REF=master
-    --build-arg SSH_RSA_KEY=private/id_rsa
-    .
-  - docker push $CONTAINER_TEST_IMAGE
+    # Write the id_rsa private key into the good path
+    - mkdir -p private && echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
+    - docker build -t $CONTAINER_TEST_IMAGE --add-host ${GITLAB_HOST}:192.168.1.15
+      --build-arg BUILD_VERSION=${APP_VERSION}
+      --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+      --build-arg GITLAB_HOST=${GITLAB_HOST}
+      --build-arg PROJECT_NAME=${PROJECT_NAME}
+      --build-arg MODULE_NAME=${MODULE_NAME}
+      --build-arg MODULE_DESCRIPTION="${MODULE_DESCRIPTION}"
+      --build-arg VCS_REF=master
+      --build-arg SSH_RSA_KEY=private/id_rsa
+      .
+    - docker push $CONTAINER_TEST_IMAGE
   tags: [docker,milobella]
 
 release-image:
   stage: release
+  before_script:
+    - export APP_VERSION=$(cat VERSION.txt)
+    # Login to gitlab registry
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    # Login to docker hub
+    - docker login -u $DOCKER_USER -p $DOCKER_PASS
   script:
     - docker pull $CONTAINER_TEST_IMAGE
     # Push to docker hub registry
     - docker tag $CONTAINER_TEST_IMAGE $DH_REGISTRY_IMAGE:latest
-    - docker tag $CONTAINER_TEST_IMAGE $DH_REGISTRY_IMAGE:$(cat VERSION.txt)
+    - docker tag $CONTAINER_TEST_IMAGE $DH_REGISTRY_IMAGE:${APP_VERSION}
     - docker push $DH_REGISTRY_IMAGE:latest
-    - docker push $DH_REGISTRY_IMAGE:$(cat VERSION.txt)
+    - docker push $DH_REGISTRY_IMAGE:${APP_VERSION}
     # Push to gitlab registry
     - docker tag $CONTAINER_TEST_IMAGE $CI_REGISTRY_IMAGE:latest
-    - docker tag $CONTAINER_TEST_IMAGE $CI_REGISTRY_IMAGE:$(cat VERSION.txt)
+    - docker tag $CONTAINER_TEST_IMAGE $CI_REGISTRY_IMAGE:${APP_VERSION}
     - docker push $CI_REGISTRY_IMAGE:latest
-    - docker push $CI_REGISTRY_IMAGE:$(cat VERSION.txt)
+    - docker push $CI_REGISTRY_IMAGE:${APP_VERSION}
   tags: [docker,milobella]
   only: [master]
 
-
+deploy:
+  stage: deploy
+  image: dtzar/helm-kubectl
+  before_script:
+    - export APP_VERSION=$(cat VERSION.txt)
+    - mkdir -p bin /etc/kubernetes
+    # Configurate the kubectl command to request the minikube cluster
+    - echo ${MINIKUBE_CLIENT_CRT} | base64 -d > /etc/kubernetes/minikube-client.crt
+    - echo ${MINIKUBE_CLIENT_KEY} | base64 -d > /etc/kubernetes/minikube-client.key
+    - mv helm/.kubeconfig /etc/kubernetes/.config
+    - export KUBECONFIG=/etc/kubernetes/.config
+    # Initialize helm client without tiller
+    - helm init --client-only
+  script:
+    # Package the helm chart into a tgz repository
+    - helm package helm/oratio --app-version=${APP_VERSION} --destination bin
+    # Install/Upgrade the freshly packaged helm chart into the minikube cluster
+    - helm upgrade --install oratio bin/oratio-*.tgz --debug --set image.tag=${APP_VERSION}
+  tags: [docker,milobella]
+  only: [master]
+  
