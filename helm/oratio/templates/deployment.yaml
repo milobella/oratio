@@ -22,7 +22,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["/bin/main", "--config-file", "/etc/k8s-config/config.toml"]
+          command: ["/bin/main", "--configfile", "/etc/k8s-config/config.toml"]
           volumeMounts:
             - name: "config-volume"
               mountPath: "/etc/k8s-config"
