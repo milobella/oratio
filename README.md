@@ -5,7 +5,7 @@ answer.
 ## Prerequisites
 
 - Having ``golang`` installed [instructions](https://golang.org/doc/install)
-- Having ``go dep`` installed [instructins](https://golang.github.io/dep/docs/installation.html)
+- Having ``go dep`` installed [instructions](https://golang.github.io/dep/docs/installation.html)
 
 ## Install
 
