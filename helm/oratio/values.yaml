@@ -14,16 +14,6 @@ fullnameOverride: ""
 containerPort: 9100
 nodePort: 31333
 
-env:
-  - name: ORATIO_CEREBRO_HOST
-    value: "cerebro"
-  - name: ORATIO_CEREBRO_PORT
-    value: "9444"
-  - name: ORATIO_ANIMA_HOST
-    value: "anima"
-  - name: ORATIO_ANIMA_PORT
-    value: "9333"
-
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little

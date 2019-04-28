@@ -6,8 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.1]
 ### Added
-- Set ``ORATIO_ANIMA_PORT`` and ``ORATIO_CEREBRO_PORT`` environment variables
+- Set ``ORATIO_ANIMA_PORT`` and ``ORATIO_CEREBRO_PORT`` environment variables.
+
+### Changed
+- Add a config map which comes to replace the environment variables setting.
 
 ## [0.1.0]
 ### Added
-- Created the helm chart with a deployment and a service
+- Created the helm chart with a deployment and a service.

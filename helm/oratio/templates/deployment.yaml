@@ -22,6 +22,10 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: ["/bin/main", "--config-file", "/etc/k8s-config/config.toml"]
+          volumeMounts:
+            - name: "config-volume"
+              mountPath: "/etc/k8s-config"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.containerPort }}
@@ -31,6 +35,13 @@ spec:
           env:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "oratio.fullname" . }}
+            items:
+              - key: configuration-file
+                path: config.toml
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
