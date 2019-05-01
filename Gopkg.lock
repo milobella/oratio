@@ -62,11 +62,11 @@
   version = "v1.2.0"
 
 [[projects]]
-  branch = "master"
   name = "gitlab.milobella.com/milobella/ability-sdk-go"
   packages = ["pkg/ability"]
-  revision = "0eb4c71d36144aa9f65306d35d77c92de91a4d20"
+  revision = "4ef6607f9364e5d8c94b08a606c069614784eb04"
   source = "https://gitlab.milobella.com/milobella/abilities/ability-sdk-go.git"
+  version = "0.1.0"
 
 [[projects]]
   branch = "master"
@@ -95,6 +95,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "69d76d399e8a107a80c49c8d9c55ebc10fa406dd4d7e2175cefd850ba2cfc0b8"
+  inputs-digest = "d02fd0b59d0006ad83ea95578a70f97cf9e26a10ab7eb21250942a68747e0587"
   solver-name = "gps-cdcl"
   solver-version = 1
