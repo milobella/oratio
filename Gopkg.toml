@@ -32,8 +32,4 @@
 [[constraint]]
   name = "gitlab.milobella.com/milobella/ability-sdk-go"
   source = "https://gitlab.milobella.com/milobella/abilities/ability-sdk-go.git"
-  version = "0.1.0"
-
-[prune]
-  go-tests = true
-  unused-packages = true
+  version = "0.2.0"

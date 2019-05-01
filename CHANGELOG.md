@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ##  [Unreleased]
 ###  Added
+- Added the auto_reprompt field in the response
 - Created a Dockerfile to generate a docker image
 - Call of anima (Natural Language Generation)
 - Call of cerebro (Natural Language Understanding)

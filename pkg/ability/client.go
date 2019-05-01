@@ -58,7 +58,8 @@ func (c Client) makeRequest(request ability.Request) (response ability.Response,
 	return
 }
 
-func (c Client) CallAbility(nlu cerebro.NLU) (nlg anima.NLG, visu interface{}) {
+func (c Client) CallAbility(nlu cerebro.NLU) (nlg anima.NLG, visu interface{}, auto_reprompt bool) {
+	auto_reprompt = false
 	request := ability.Request{Nlu: nlu}
 	result, err := c.makeRequest(request)
 	if err != nil {
@@ -69,5 +70,6 @@ func (c Client) CallAbility(nlu cerebro.NLU) (nlg anima.NLG, visu interface{}) {
 
 	nlg = result.Nlg
 	visu = result.Visu
+	auto_reprompt = result.AutoReprompt
 	return
 }

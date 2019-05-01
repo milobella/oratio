@@ -20,65 +20,53 @@
   version = "v0.1.1"
 
 [[projects]]
-  name = "github.com/gorilla/context"
-  packages = ["."]
-  revision = "08b5f424b9271eedf6f9f0ce86cb9396ed337a42"
-  version = "v1.1.1"
-
-[[projects]]
   name = "github.com/gorilla/mux"
   packages = ["."]
-  revision = "e3702bed27f0d39777b0b37b664b6280e8ef8fbf"
-  version = "v1.6.2"
+  revision = "c5c6c98bc25355028a63748a498942a6398ccd22"
+  version = "v1.7.1"
 
 [[projects]]
   branch = "master"
   name = "github.com/juju/loggo"
   packages = ["."]
-  revision = "584905176618da46b895b176c721b02c476b6993"
+  revision = "d976af380377adda50b2d34279f1dec3507504ac"
 
 [[projects]]
   name = "github.com/konsorten/go-windows-terminal-sequences"
   packages = ["."]
-  revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
-  version = "v1.0.1"
+  revision = "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e"
+  version = "v1.0.2"
 
 [[projects]]
   name = "github.com/pelletier/go-toml"
   packages = ["."]
-  revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
-  version = "v1.2.0"
+  revision = "63909f0a90ab0f36909e8e044e46ace10cf13ba2"
+  version = "v1.3.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/prometheus/common"
   packages = ["log"]
-  revision = "4724e9255275ce38f7179b2478abeae4e28c904f"
+  revision = "a82f4c12f983cc2649298185f296632953e50d3e"
+  version = "v0.3.0"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "bcd833dfe83d3cebad139e4a29ed79cb2318bf95"
-  version = "v1.2.0"
+  revision = "8bdbc7bcc01dcbb8ec23dc8a28e332258d25251f"
+  version = "v1.4.1"
 
 [[projects]]
   name = "gitlab.milobella.com/milobella/ability-sdk-go"
   packages = ["pkg/ability"]
-  revision = "4ef6607f9364e5d8c94b08a606c069614784eb04"
+  revision = "faacca291414793ee6f8b72088374d40df0f8be5"
   source = "https://gitlab.milobella.com/milobella/abilities/ability-sdk-go.git"
-  version = "0.1.0"
-
-[[projects]]
-  branch = "master"
-  name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
-  revision = "eb0de9b17e854e9b1ccd9963efafc79862359959"
+  version = "0.2.0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows","windows/registry","windows/svc/eventlog"]
-  revision = "62eef0e2fa9b2c385f7b2778e763486da6880d37"
+  revision = "d89cdac9e8725f2aefce25fcbfef41134c9ad412"
 
 [[projects]]
   name = "gopkg.in/alecthomas/kingpin.v2"
@@ -89,12 +77,12 @@
 [[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
-  version = "v2.2.1"
+  revision = "51d6538a90f86fe93ac480b35f37b2be17fef232"
+  version = "v2.2.2"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d02fd0b59d0006ad83ea95578a70f97cf9e26a10ab7eb21250942a68747e0587"
+  inputs-digest = "98325a3cc29b63dfc2d8ccd97e95e4eec738f08dd61aae6036c0d8ea18d9eace"
   solver-name = "gps-cdcl"
   solver-version = 1
