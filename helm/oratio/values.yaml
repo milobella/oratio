@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: celiangarcia/oratio
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 nameOverride: ""
 fullnameOverride: ""
