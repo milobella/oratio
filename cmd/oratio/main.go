@@ -84,7 +84,7 @@ func main() {
 	abilityClientsMap = make(map[string]*ability.Client)
 	// TODO: Abilities should be a dynamic data
 	for _, ac := range conf.Abilities {
-		abilityClient := ability.NewClient(ac.Host, ac.Port)
+		abilityClient := ability.NewClient(ac.Host, ac.Port, ac.Name)
 		for _, intent := range ac.Intents {
 			abilityClientsMap[intent] = abilityClient
 		}
