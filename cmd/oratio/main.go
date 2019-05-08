@@ -112,10 +112,12 @@ func main() {
 	<-done
 }
 
+// RequestBody is the main request body or oratio
 type RequestBody struct {
 	Text string `json:"text,omitempty"`
 }
 
+// ResponseBody is the main response body or oratio
 type ResponseBody struct {
 	Vocal        string      `json:"vocal,omitempty"`
 	Visu         interface{} `json:"visu,omitempty"`
@@ -132,11 +134,11 @@ func textRequest(w http.ResponseWriter, r *http.Request) {
 
 	// Execute the processing flow
 	nlu := cerebroClient.UnderstandText(body.Text)
-	nlg, visu, auto_reprompt := callAbility(nlu)
+	nlg, visu, autoReprompt := callAbility(nlu)
 	vocal := animaClient.GenerateSentence(nlg)
 
 	// Build the response
-	json.NewEncoder(w).Encode(ResponseBody{Vocal: vocal, Visu: visu, AutoReprompt: auto_reprompt})
+	json.NewEncoder(w).Encode(ResponseBody{Vocal: vocal, Visu: visu, AutoReprompt: autoReprompt})
 }
 
 func readRequest(r *http.Request) (req RequestBody, err error) {
@@ -150,7 +152,7 @@ func readRequest(r *http.Request) (req RequestBody, err error) {
 }
 
 // Choose what ability to call according to the intent resolved by cerebro.
-func callAbility(nlu cerebro.NLU) (nlg anima.NLG, visu interface{}, auto_reprompt bool) {
+func callAbility(nlu cerebro.NLU) (nlg anima.NLG, visu interface{}, autoReprompt bool) {
 
 	// TODO put personal request in anima
 	if nlu.BestIntent == "HELLO" {
