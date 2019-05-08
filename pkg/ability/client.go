@@ -32,30 +32,30 @@ func (c Client) makeRequest(request ability.Request) (response ability.Response,
 	endpoint := strings.Join([]string{c.url, "resolve", request.Nlu.BestIntent}, "/")
 	postBody, err := json.Marshal(request)
 	if err != nil {
-		logrus.Warn(err)
+		logrus.Error(err)
 		return
 	}
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(postBody))
 	if err != nil {
-		logrus.Warn(err)
+		logrus.Error(err)
 		return
 	}
 
 	resp, err := c.client.Do(req)
 	if err != nil {
-		logrus.Warn(err)
+		logrus.Error(err)
 		return
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		logrus.Warn(err)
+		logrus.Error(err)
 		return
 	}
 
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		logrus.Warn(err)
+		logrus.Error(err)
 		return
 	}
 	return
@@ -68,7 +68,7 @@ func (c Client) CallAbility(nlu cerebro.NLU) (nlg anima.NLG, visu interface{}, a
 	request := ability.Request{Nlu: nlu}
 	result, err := c.makeRequest(request)
 	if err != nil {
-		logrus.Warn(err)
+		logrus.Error(err)
 		nlg.Sentence = "error"
 		return
 	}

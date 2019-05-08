@@ -4,15 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Client struct {
-	host string
-	port int
-	url string
+	host   string
+	port   int
+	url    string
 	client http.Client
 }
 
@@ -46,7 +47,7 @@ func (c Client) makeRequest(query string) (result NLU, err error) {
 	understandEndpoint := strings.Join([]string{c.url, "understand"}, "/")
 	req, err := http.NewRequest("GET", understandEndpoint, nil)
 	if err != nil {
-		log.Print(err)
+		logrus.Error(err)
 		return
 	}
 	q := req.URL.Query()
@@ -55,13 +56,13 @@ func (c Client) makeRequest(query string) (result NLU, err error) {
 
 	resp, err := c.client.Do(req)
 	if err != nil {
-		log.Print(err)
+		logrus.Error(err)
 		return
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		log.Print(err)
+		logrus.Error(err)
 		return
 	}
 
