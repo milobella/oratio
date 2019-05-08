@@ -4,21 +4,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Client struct {
-	host string
-	port int
-	url string
+	host   string
+	port   int
+	url    string
 	client http.Client
+	name   string
 }
 
 func NewClient(host string, port int) *Client {
 	url := fmt.Sprintf("http://%s:%d", host, port)
-	return &Client{host: host, port: port, url: url, client: http.Client{}}
+	return &Client{host: host, port: port, url: url, client: http.Client{}, name: "cerebro"}
 }
 
 func (c Client) UnderstandText(t string) (result NLU) {
@@ -46,7 +48,7 @@ func (c Client) makeRequest(query string) (result NLU, err error) {
 	understandEndpoint := strings.Join([]string{c.url, "understand"}, "/")
 	req, err := http.NewRequest("GET", understandEndpoint, nil)
 	if err != nil {
-		log.Print(err)
+		logrus.WithField("client", c.name).Error(err)
 		return
 	}
 	q := req.URL.Query()
@@ -55,13 +57,16 @@ func (c Client) makeRequest(query string) (result NLU, err error) {
 
 	resp, err := c.client.Do(req)
 	if err != nil {
-		log.Print(err)
+		logrus.WithField("client", c.name).Error(err)
 		return
 	}
+
+	logrus.WithField("client", c.name).WithField("status", resp.StatusCode).Infof("%s %s", req.Method, req.URL)
+
 	body, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		log.Print(err)
+		logrus.WithField("client", c.name).Error(err)
 		return
 	}
 
