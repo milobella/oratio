@@ -16,12 +16,13 @@ import (
 	"gitlab.milobella.com/milobella/oratio/pkg/ability"
 	"gitlab.milobella.com/milobella/oratio/pkg/anima"
 	"gitlab.milobella.com/milobella/oratio/pkg/cerebro"
+	"gitlab.milobella.com/milobella/oratio/pkg/logrushttp"
 )
 
 //TODO: use this init function to initialize variables instead of initialize on top
 func init() {
 	// Log as JSON instead of the default ASCII formatter.
-	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.SetFormatter(&logrus.TextFormatter{})
 
 	// Output to stdout instead of the default stderr
 	// Can be any io.Writer, see below for File example
@@ -91,6 +92,10 @@ func main() {
 
 	// Initialize the server's router
 	router := mux.NewRouter()
+
+	middleware := logrushttp.NewLogrusMiddlewareBuilder().ActivatedRequestData(
+		[]string{"request", "method"}).ActivatedResponseData([]string{"status"}).Build()
+	router.Use(middleware.Handle)
 	router.HandleFunc("/talk/text", textRequest).Methods("POST")
 
 	// Initializing the server
