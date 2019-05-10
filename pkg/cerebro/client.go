@@ -70,7 +70,7 @@ func (c Client) makeRequest(query string) (result NLU, err error) {
 		return
 	}
 	
-	logrus.WithField("client", c.name).Debug(body)
+	logrus.WithField("client", c.name).Debug(string(body))
 
 	err = json.Unmarshal(body, &result)
 	return
