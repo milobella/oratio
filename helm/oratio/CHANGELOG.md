@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Use ``Always`` imagePullPolicy.
-- Set deployment strategy to rolling update.
+- Set deployment strategy to recreate.
 
 ## [0.1.1]
 ### Added

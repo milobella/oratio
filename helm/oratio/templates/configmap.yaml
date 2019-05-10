@@ -35,6 +35,6 @@ data:
 
     [[abilities]]
         name = "shoppinglist"
-        intents = ["ADD_TO_LIST, TRIGGER_SHOPPING_LIST"]
+        intents = ["ADD_TO_LIST", "TRIGGER_SHOPPING_LIST"]
         host = "ability-shoppinglist"
         port = 4444
