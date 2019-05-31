@@ -16,7 +16,6 @@ type Entity struct {
 	Text  string
 }
 
-
 func (nlu *NLU) GetBestIntentOr(fallback string) string {
 	if len(nlu.Intents) != 0 && nlu.BestIntent != ""  {
 		return nlu.BestIntent
