@@ -1,4 +1,6 @@
-image: docker:stable
+include:
+  - project: 'milobella/devops/ci-templates'
+    file: '/templates/go-ability.yml'
 
 stages:
   - build
@@ -8,65 +10,8 @@ stages:
 variables:
   CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   DH_REGISTRY_IMAGE: $DOCKER_USER/$CI_PROJECT_NAME
-
-.build:
-  variables:
-    PROJECT_NAME: "milobella"
-    MODULE_NAME: ${CI_PROJECT_NAME}
-    GITLAB_HOST: "gitlab.milobella.com"
-    MODULE_DESCRIPTION: "Http server which is the main and only entry point of Milobella."
-  script:
-    # Write the id_rsa private key into the good path
-    - mkdir -p private && echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
-    - docker build -t $CONTAINER_TEST_IMAGE --add-host ${GITLAB_HOST}:192.168.1.15
-      --build-arg BUILD_VERSION=${APP_VERSION}
-      --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-      --build-arg GITLAB_HOST=${GITLAB_HOST}
-      --build-arg PROJECT_NAME=${PROJECT_NAME}
-      --build-arg MODULE_NAME=${MODULE_NAME}
-      --build-arg MODULE_DESCRIPTION="${MODULE_DESCRIPTION}"
-      --build-arg VCS_REF=master
-      --build-arg SSH_RSA_KEY=private/id_rsa
-      .
-  tags: [docker,milobella]
-
-build:
-  stage: build
-  extends: .build
-  except: [master]
-
-build-release-image:
-  stage: release
-  extends: .build
-  before_script:
-    - export APP_VERSION=$(cat VERSION.txt)
-    # Login to docker hub
-    - docker login -u $DOCKER_USER -p $DOCKER_PASS
-  after_script:
-    - docker tag $CONTAINER_TEST_IMAGE $DH_REGISTRY_IMAGE:latest
-    - docker tag $CONTAINER_TEST_IMAGE $DH_REGISTRY_IMAGE:${APP_VERSION}
-    - docker push $DH_REGISTRY_IMAGE:latest
-    - docker push $DH_REGISTRY_IMAGE:${APP_VERSION}
-  only: [master]
-
-deploy:
-  stage: deploy
-  image: dtzar/helm-kubectl
-  before_script:
-    - export APP_VERSION=$(cat VERSION.txt)
-    - mkdir -p bin /etc/kubernetes
-    # Configurate the kubectl command to request the minikube cluster
-    - echo ${MINIKUBE_CLIENT_CRT} | base64 -d > /etc/kubernetes/minikube-client.crt
-    - echo ${MINIKUBE_CLIENT_KEY} | base64 -d > /etc/kubernetes/minikube-client.key
-    - mv helm/.kubeconfig /etc/kubernetes/.config
-    - export KUBECONFIG=/etc/kubernetes/.config
-    # Initialize helm client without tiller
-    - helm init --client-only
-  script:
-    # Package the helm chart into a tgz repository
-    - helm package helm/oratio --app-version=${APP_VERSION} --destination bin
-    # Install/Upgrade the freshly packaged helm chart into the minikube cluster
-    - helm upgrade --recreate-pods --force --install oratio bin/oratio-*.tgz --debug --set image.tag=${APP_VERSION}
-  tags: [docker,milobella]
-  only: [master]
-  
+  PROJECT_NAME: "milobella"
+  MODULE_NAME: ${CI_PROJECT_NAME}
+  GITLAB_HOST: "gitlab.milobella.com"
+  MODULE_DESCRIPTION: "Http server which is the main and only entry point of Milobella."
+  HELM_NAME: "oratio"
