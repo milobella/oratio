@@ -13,17 +13,17 @@ port = 9333
 [[abilities]]
     name = "cinema"
     intents = ["LAST_SHOWTIME"]
-    host = "cinema-ability"
+    host = "localhost"
     port = 10200
 
 #[[abilities]]
 #    name = "clock"
 #    intents = ["GET_TIME"]
-#    host = "clock-ability"
+#    host = "localhost"
 #    port = 10300
 
 [[abilities]]
     name = "shoppinglist"
     intents = ["ADD_TO_LIST", "TRIGGER_SHOPPING_LIST"]
-    host = "ability-shoppinglist"
+    host = "localhost"
     port = 4444

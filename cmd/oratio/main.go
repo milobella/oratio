@@ -2,21 +2,16 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net"
-	"net/http"
-	"os"
-	"time"
-
 	"github.com/celian-garcia/gonfig"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"gitlab.milobella.com/milobella/oratio/internal/config"
+	"gitlab.milobella.com/milobella/oratio/internal/logging"
+	"gitlab.milobella.com/milobella/oratio/internal/server"
 	"gitlab.milobella.com/milobella/oratio/pkg/ability"
 	"gitlab.milobella.com/milobella/oratio/pkg/anima"
 	"gitlab.milobella.com/milobella/oratio/pkg/cerebro"
-	"gitlab.milobella.com/milobella/oratio/pkg/logrushttp"
+	"os"
 )
 
 //TODO: use this init function to initialize variables instead of initialize on top
@@ -90,90 +85,21 @@ func main() {
 		}
 	}
 
+	// Build the handler
+	abilityService := &server.AbilityService{Clients: abilityClientsMap}
+	textHandler := server.TextRequestHandler{
+		CerebroClient: cerebroClient,
+		AnimaClient: animaClient,
+		AbilityService: abilityService,
+	}
+
 	// Initialize the server's router
 	router := mux.NewRouter()
 
-	middleware := logrushttp.NewLogrusMiddlewareBuilder().ActivatedRequestData(
-		[]string{"request", "method"}).ActivatedResponseData([]string{"status"}).Build()
-	router.Use(middleware.Handle)
-	router.HandleFunc("/talk/text", textRequest).Methods("POST")
+	logMiddleware := logging.InitializeLoggingMiddleware()
+	router.Use(logMiddleware.Handle)
+	router.HandleFunc("/talk/text", textHandler.HandleTextRequest).Methods("POST")
 
-	// Initializing the server
-	addr := fmt.Sprintf(":%d", conf.Server.Port)
-	listener, err := net.Listen("tcp", addr)
-	if err != nil {
-		logrus.Fatalf("Error initializing the server : %s", err)
-	}
-
-	// Start the server
-	done := make(chan bool)
-	go http.Serve(listener, router)
-	logrus.Infof("Successfully started the Milobella::Oratio server on port %d !", conf.Server.Port)
-	<-done
-}
-
-// RequestBody is the main request body or oratio
-type RequestBody struct {
-	Text string `json:"text,omitempty"`
-}
-
-// ResponseBody is the main response body or oratio
-type ResponseBody struct {
-	Vocal        string      `json:"vocal,omitempty"`
-	Visu         interface{} `json:"visu,omitempty"`
-	AutoReprompt bool        `json:"auto_reprompt,omitempty"`
-}
-
-func textRequest(w http.ResponseWriter, r *http.Request) {
-
-	// Read the request
-	body, err := readRequest(r)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-	}
-
-	// Execute the processing flow
-	nlu := cerebroClient.UnderstandText(body.Text)
-	nlg, visu, autoReprompt := callAbility(nlu)
-	vocal := animaClient.GenerateSentence(nlg)
-
-	// Build the response
-	json.NewEncoder(w).Encode(ResponseBody{Vocal: vocal, Visu: visu, AutoReprompt: autoReprompt})
-}
-
-func readRequest(r *http.Request) (req RequestBody, err error) {
-	b, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(b, &req)
-	return
-}
-
-// Choose what ability to call according to the intent resolved by cerebro.
-func callAbility(nlu cerebro.NLU) (nlg anima.NLG, visu interface{}, autoReprompt bool) {
-
-	// TODO put personal request in anima
-	if nlu.BestIntent == "HELLO" {
-		return anima.NLG{Sentence: "Hello"}, nil, false
-	}
-
-	// TODO put time request in clock ability
-	if nlu.BestIntent == "GET_TIME" {
-		timeVal := fmt.Sprintf("%d h %d", time.Now().Hour(), time.Now().Minute())
-		return anima.NLG{
-			Sentence: "It is {{time}}",
-			Params: []anima.NLGParam{{
-				Name:  "time",
-				Value: timeVal,
-				Type:  "time",
-			}}}, nil, false
-	}
-
-	if client, ok := abilityClientsMap[nlu.BestIntent]; ok {
-		return client.CallAbility(nlu)
-	}
-
-	return anima.NLG{Sentence: "Oups !"}, nil, false
+	srv := server.Server{Router: router, Port: conf.Server.Port}
+	srv.Run()
 }

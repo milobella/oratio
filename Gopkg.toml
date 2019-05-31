@@ -28,8 +28,3 @@
 [[constraint]]
   name = "github.com/gorilla/mux"
   version = "1.6.2"
-
-[[constraint]]
-  name = "gitlab.milobella.com/milobella/ability-sdk-go"
-  source = "https://gitlab.milobella.com/milobella/abilities/ability-sdk-go.git"
-  version = "0.2.0"
