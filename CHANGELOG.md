@@ -6,9 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ##  [Unreleased]
 ###  Added
+- [Cerebro client] Use ``POST`` on ``/understand`` endpoint.
 - Add ``LastAbility`` to context.
 - Manage context transmitting it to the ability.
-- [Calling ability] Removed intent from ``/resolve`` url.
+- [Ability client] Removed intent from ``/resolve`` url.
 - Update internal architecture in modules.
 - Integrated ``logrus`` as logging solution.
 - Added the auto_reprompt field in the response.
