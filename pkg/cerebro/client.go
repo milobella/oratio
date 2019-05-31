@@ -1,6 +1,7 @@
 package cerebro
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -46,14 +47,12 @@ func (c Client) bestNLU(result *NLU) {
 
 func (c Client) makeRequest(query string) (result NLU, err error) {
 	understandEndpoint := strings.Join([]string{c.url, "understand"}, "/")
-	req, err := http.NewRequest("GET", understandEndpoint, nil)
+	reqBody := []byte(fmt.Sprintf("{\"text\": \"%s\"}", query))
+	req, err := http.NewRequest("POST", understandEndpoint, bytes.NewBuffer(reqBody))
 	if err != nil {
 		logrus.WithField("client", c.name).Error(err)
 		return
 	}
-	q := req.URL.Query()
-	q.Add("query", query)
-	req.URL.RawQuery = q.Encode()
 
 	resp, err := c.client.Do(req)
 	if err != nil {

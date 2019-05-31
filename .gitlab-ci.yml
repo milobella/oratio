@@ -9,17 +9,12 @@ variables:
   CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   DH_REGISTRY_IMAGE: $DOCKER_USER/$CI_PROJECT_NAME
 
-build:
-  stage: build
+.build:
   variables:
     PROJECT_NAME: "milobella"
     MODULE_NAME: ${CI_PROJECT_NAME}
     GITLAB_HOST: "gitlab.milobella.com"
     MODULE_DESCRIPTION: "Http server which is the main and only entry point of Milobella."
-  before_script:
-    - export APP_VERSION=$(cat VERSION.txt)
-    # Login to gitlab registry
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     # Write the id_rsa private key into the good path
     - mkdir -p private && echo "$SSH_PRIVATE_KEY" | tr -d '\r' > private/id_rsa
@@ -33,30 +28,25 @@ build:
       --build-arg VCS_REF=master
       --build-arg SSH_RSA_KEY=private/id_rsa
       .
-    - docker push $CONTAINER_TEST_IMAGE
   tags: [docker,milobella]
 
-release-image:
+build:
+  stage: build
+  extends: .build
+  except: [master]
+
+build-release-image:
   stage: release
+  extends: .build
   before_script:
     - export APP_VERSION=$(cat VERSION.txt)
-    # Login to gitlab registry
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     # Login to docker hub
     - docker login -u $DOCKER_USER -p $DOCKER_PASS
-  script:
-    - docker pull $CONTAINER_TEST_IMAGE
-    # Push to docker hub registry
+  after_script:
     - docker tag $CONTAINER_TEST_IMAGE $DH_REGISTRY_IMAGE:latest
     - docker tag $CONTAINER_TEST_IMAGE $DH_REGISTRY_IMAGE:${APP_VERSION}
     - docker push $DH_REGISTRY_IMAGE:latest
     - docker push $DH_REGISTRY_IMAGE:${APP_VERSION}
-    # Push to gitlab registry
-    - docker tag $CONTAINER_TEST_IMAGE $CI_REGISTRY_IMAGE:latest
-    - docker tag $CONTAINER_TEST_IMAGE $CI_REGISTRY_IMAGE:${APP_VERSION}
-    - docker push $CI_REGISTRY_IMAGE:latest
-    - docker push $CI_REGISTRY_IMAGE:${APP_VERSION}
-  tags: [docker,milobella]
   only: [master]
 
 deploy:
@@ -76,7 +66,7 @@ deploy:
     # Package the helm chart into a tgz repository
     - helm package helm/oratio --app-version=${APP_VERSION} --destination bin
     # Install/Upgrade the freshly packaged helm chart into the minikube cluster
-    - helm upgrade --install oratio bin/oratio-*.tgz --debug --set image.tag=${APP_VERSION}
+    - helm upgrade --recreate-pods --force --install oratio bin/oratio-*.tgz --debug --set image.tag=${APP_VERSION}
   tags: [docker,milobella]
   only: [master]
   
