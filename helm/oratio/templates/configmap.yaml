@@ -27,6 +27,12 @@ data:
         host = "ability-cinema"
         port = 4444
 
+    [[abilities]]
+        name = "weather"
+        intents = ["GET_WEATHER"]
+        host = "ability-weather"
+        port = 4444
+
     #[[abilities]]
     #    name = "clock"
     #    intents = ["GET_TIME"]
