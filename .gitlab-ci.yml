@@ -1,6 +1,6 @@
 include:
   - project: 'milobella/devops/ci-templates'
-    file: '/templates/go-ability.yml'
+    file: '/templates/common-template.yml'
 
 stages:
   - build
