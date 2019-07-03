@@ -8,12 +8,9 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  type: NodePort
   ports:
     - port: {{ .Values.containerPort }}
-      targetPort: {{ .Values.containerPort }}
       protocol: TCP
-      nodePort: {{ .Values.nodePort }}
   selector:
     app.kubernetes.io/name: {{ include "oratio.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
