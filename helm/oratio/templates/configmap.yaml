@@ -33,11 +33,11 @@ data:
         host = "ability-weather"
         port = 4444
 
-    #[[abilities]]
-    #    name = "clock"
-    #    intents = ["GET_TIME"]
-    #    host = "ability-clock"
-    #    port = 4444
+    [[abilities]]
+        name = "clock"
+        intents = ["GET_TIME"]
+        host = "ability-clock"
+        port = 4444
 
     [[abilities]]
         name = "shoppinglist"

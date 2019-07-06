@@ -16,12 +16,6 @@ port = 9333
     host = "localhost"
     port = 10200
 
-#[[abilities]]
-#    name = "clock"
-#    intents = ["GET_TIME"]
-#    host = "localhost"
-#    port = 10300
-
 [[abilities]]
     name = "shoppinglist"
     intents = ["ADD_TO_LIST", "TRIGGER_SHOPPING_LIST"]

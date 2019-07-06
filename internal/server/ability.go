@@ -22,19 +22,6 @@ func (acr *AbilityService) RequestAbility(nlu cerebro.NLU, context ability.Conte
 		return anima.NLG{Sentence: "Hello"}, nil, false, ability.Context{}
 	}
 
-	// TODO put time request in clock ability
-	if intentOrAbility == "GET_TIME" {
-		now := time.Now()
-		timeVal := fmt.Sprintf("%d h %d", now.Hour(), now.Minute())
-		return anima.NLG{
-			Sentence: "It is {{time}}",
-			Params: []anima.NLGParam{{
-				Name:  "time",
-				Value: timeVal,
-				Type:  "time",
-			}}}, nil, false, ability.Context{}
-	}
-
 	if client, ok := acr.Clients[intentOrAbility]; ok {
 		return doRequest(client, ability.Request{Nlu: nlu, Context: context})
 	}
