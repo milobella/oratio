@@ -11,7 +11,6 @@ answer.
 ## Install
 
 ```bash
-$ dep ensure
 $ go build -o bin/oratio cmd/oratio/main.go
 ```
 

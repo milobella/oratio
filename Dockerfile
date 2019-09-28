@@ -33,10 +33,12 @@ WORKDIR $APPLICATION_SOURCES
 RUN git config --global url."https://oauth2:${GITLAB_TOKEN}@milobella.com/gitlab".insteadOf "https://milobella.com/gitlab"
 
 # Build the ability
-RUN go build -o /bin/main cmd/ability/main.go
+RUN go build -o /bin/main cmd/$MODULE_NAME/main.go
+ENV CONFIGURATION_PATH=/etc/$MODULE_NAME.toml
+RUN cp config/$MODULE_NAME.toml ${CONFIGURATION_PATH}
 
 # Remove milobella token
 RUN git config --global --remove-section url."https://oauth2:${GITLAB_TOKEN}@milobella.com/gitlab"
 
 # Build the main command
-CMD /bin/main
+CMD /bin/main --configfile ${CONFIGURATION_PATH}
