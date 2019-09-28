@@ -1,6 +1,6 @@
 package server
 
-import "gitlab.milobella.com/milobella/oratio/pkg/ability"
+import "milobella.com/gitlab/milobella/oratio/pkg/ability"
 
 // RequestBody is the main request body or oratio
 type RequestBody struct {

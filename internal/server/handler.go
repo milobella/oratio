@@ -2,8 +2,8 @@ package server
 
 import (
 	"encoding/json"
-	"gitlab.milobella.com/milobella/oratio/pkg/anima"
-	"gitlab.milobella.com/milobella/oratio/pkg/cerebro"
+	"milobella.com/gitlab/milobella/oratio/pkg/anima"
+	"milobella.com/gitlab/milobella/oratio/pkg/cerebro"
 	"io/ioutil"
 	"net/http"
 )

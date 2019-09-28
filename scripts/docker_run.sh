@@ -5,7 +5,7 @@ echo "== Variables initialization :"
 BUILD_VERSION=$(cat VERSION.txt)
 echo "BUILD_VERSION=\"$BUILD_VERSION\""
 
-GITLAB_HOST="gitlab.milobella.com"
+GITLAB_HOST="milobella.com/gitlab"
 echo "GITLAB_HOST=\"$GITLAB_HOST\""
 
 PROJECT_NAME="milobella"

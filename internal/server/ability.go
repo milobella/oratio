@@ -1,9 +1,9 @@
 package server
 
 import (
-	"gitlab.milobella.com/milobella/oratio/pkg/ability"
-	"gitlab.milobella.com/milobella/oratio/pkg/anima"
-	"gitlab.milobella.com/milobella/oratio/pkg/cerebro"
+	"milobella.com/gitlab/milobella/oratio/pkg/ability"
+	"milobella.com/gitlab/milobella/oratio/pkg/anima"
+	"milobella.com/gitlab/milobella/oratio/pkg/cerebro"
 )
 
 type AbilityService struct {

@@ -5,12 +5,12 @@ import (
 	"github.com/celian-garcia/gonfig"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
-	"gitlab.milobella.com/milobella/oratio/internal/config"
-	"gitlab.milobella.com/milobella/oratio/internal/logging"
-	"gitlab.milobella.com/milobella/oratio/internal/server"
-	"gitlab.milobella.com/milobella/oratio/pkg/ability"
-	"gitlab.milobella.com/milobella/oratio/pkg/anima"
-	"gitlab.milobella.com/milobella/oratio/pkg/cerebro"
+	"milobella.com/gitlab/milobella/oratio/internal/config"
+	"milobella.com/gitlab/milobella/oratio/internal/logging"
+	"milobella.com/gitlab/milobella/oratio/internal/server"
+	"milobella.com/gitlab/milobella/oratio/pkg/ability"
+	"milobella.com/gitlab/milobella/oratio/pkg/anima"
+	"milobella.com/gitlab/milobella/oratio/pkg/cerebro"
 	"os"
 )
 

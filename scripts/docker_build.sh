@@ -18,7 +18,7 @@ echo "BUILD_VERSION=\"$BUILD_VERSION\""
 BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 echo "BUILD_DATE=\"$BUILD_DATE\""
 
-GITLAB_HOST="gitlab.milobella.com"
+GITLAB_HOST="milobella.com/gitlab"
 echo "GITLAB_HOST=\"$GITLAB_HOST\""
 
 PROJECT_NAME="milobella"
