@@ -8,10 +8,8 @@ stages:
   - deploy
 
 variables:
-  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   DH_REGISTRY_IMAGE: $DOCKER_USER/$CI_PROJECT_NAME
   PROJECT_NAME: "milobella"
   MODULE_NAME: ${CI_PROJECT_NAME}
-  GITLAB_HOST: "gitlab.milobella.com"
   MODULE_DESCRIPTION: "Http server which is the main and only entry point of Milobella."
   HELM_NAME: "oratio"
