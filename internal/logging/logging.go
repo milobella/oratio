@@ -1,6 +1,6 @@
 package logging
 
-import "milobella.com/gitlab/milobella/oratio/pkg/logrushttp"
+import "github.com/milobella/oratio/pkg/logrushttp"
 
 func InitializeLoggingMiddleware() logrushttp.LogrusMiddleware{
 	return logrushttp.NewLogrusMiddlewareBuilder().ActivatedRequestData(

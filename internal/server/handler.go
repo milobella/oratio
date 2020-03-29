@@ -2,8 +2,8 @@ package server
 
 import (
 	"encoding/json"
-	"milobella.com/gitlab/milobella/oratio/pkg/anima"
-	"milobella.com/gitlab/milobella/oratio/pkg/cerebro"
+	"github.com/milobella/oratio/pkg/anima"
+	"github.com/milobella/oratio/pkg/cerebro"
 	"io/ioutil"
 	"net/http"
 )
@@ -15,7 +15,6 @@ type TextRequestHandler struct {
 }
 
 func (trh *TextRequestHandler) HandleTextRequest(w http.ResponseWriter, r *http.Request) {
-
 	// Read the request
 	requestBody, err := readRequest(r)
 	if err != nil {

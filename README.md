@@ -4,7 +4,7 @@ answer.
 
 ## Prerequisites
 
-- Having access to [milobella.com/gitlab](https://milobella.com/gitlab/milobella)
+- Having access to [milobella.com/gitlab](https://github.com/milobella)
 - Having ``golang`` installed [instructions](https://golang.org/doc/install)
 - Having ``go dep`` installed [instructions](https://golang.github.io/dep/docs/installation.html)
 

@@ -1,6 +1,6 @@
 package ability
 
-import "milobella.com/gitlab/milobella/oratio/pkg/anima"
+import "github.com/milobella/oratio/pkg/anima"
 
 type Response struct {
 	Nlg          anima.NLG   `json:"nlg,omitempty"`

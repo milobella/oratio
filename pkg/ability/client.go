@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/sirupsen/logrus"
-	"milobella.com/gitlab/milobella/oratio/pkg/anima"
+	"github.com/milobella/oratio/pkg/anima"
 )
 
 // Client : Ability HTTP client
