@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"github.com/celian-garcia/gonfig"
 	"github.com/gorilla/mux"
+	"github.com/milobella/oratio/internal/auth"
+	"github.com/milobella/oratio/internal/config"
+	"github.com/milobella/oratio/internal/logging"
+	"github.com/milobella/oratio/internal/server"
+	"github.com/milobella/oratio/pkg/ability"
+	"github.com/milobella/oratio/pkg/anima"
+	"github.com/milobella/oratio/pkg/cerebro"
 	"github.com/sirupsen/logrus"
-	"milobella.com/gitlab/milobella/oratio/internal/config"
-	"milobella.com/gitlab/milobella/oratio/internal/logging"
-	"milobella.com/gitlab/milobella/oratio/internal/server"
-	"milobella.com/gitlab/milobella/oratio/pkg/ability"
-	"milobella.com/gitlab/milobella/oratio/pkg/anima"
-	"milobella.com/gitlab/milobella/oratio/pkg/cerebro"
 	"os"
 )
 
@@ -33,6 +34,7 @@ type Configuration struct {
 	Cerebro    config.CerebroConfiguration
 	Anima      config.AnimaConfiguration
 	Abilities  []config.AbilityConfiguration
+	AppSecret  string `id:"app_secret" env:"APP_SECRET" default:""`
 	ConfigFile string `short:"c"`
 }
 
@@ -88,16 +90,24 @@ func main() {
 	// Build the handler
 	abilityService := &server.AbilityService{Clients: abilityClientsMap}
 	textHandler := server.TextRequestHandler{
-		CerebroClient: cerebroClient,
-		AnimaClient: animaClient,
+		CerebroClient:  cerebroClient,
+		AnimaClient:    animaClient,
 		AbilityService: abilityService,
 	}
 
 	// Initialize the server's router
 	router := mux.NewRouter()
 
+	// Register the logging requests middleware
 	logMiddleware := logging.InitializeLoggingMiddleware()
 	router.Use(logMiddleware.Handle)
+
+	// Register the JWT authentication middleware
+	if len(conf.AppSecret) > 0 {
+		jwtMiddleware := auth.InitializeJWTMiddleware(conf.AppSecret)
+		router.Use(jwtMiddleware.Handler)
+	}
+
 	router.HandleFunc("/talk/text", textHandler.HandleTextRequest).Methods("POST")
 
 	srv := server.Server{Router: router, Port: conf.Server.Port}

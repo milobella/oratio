@@ -1,6 +1,6 @@
 package ability
 
-import "milobella.com/gitlab/milobella/oratio/pkg/cerebro"
+import "github.com/milobella/oratio/pkg/cerebro"
 
 type Request struct {
 	Nlu     cerebro.NLU `json:"nlu,omitempty"`

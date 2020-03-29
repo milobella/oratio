@@ -17,7 +17,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE
 LABEL org.label-schema.name="$PROJECT_NAME::$MODULE_NAME"
 LABEL org.label-schema.description=$MODULE_DESCRIPTION
 LABEL org.label-schema.url="https://www.$PROJECT_NAME.com/"
-LABEL org.label-schema.vcs-url="https://milobella.com/gitlab/$PROJECT_NAME/$MODULE_NAME"
+LABEL org.label-schema.vcs-url="https://github.com/$PROJECT_NAME/$MODULE_NAME"
 LABEL org.label-schema.vcs-ref=$VCS_REF
 LABEL org.label-schema.version=$BUILD_VERSION
 LABEL org.label-schema.docker.cmd="docker run -it $DOCKER_IMAGE:$BUILD_VERSION"
@@ -25,7 +25,7 @@ LABEL org.label-schema.docker.cmd="docker run -it $DOCKER_IMAGE:$BUILD_VERSION"
 # Push the current repository into the srcs and define it as working dir
 ENV GOPATH_SOURCES="$GOPATH/src"
 ENV GOPRIVATE="milobella.com"
-ENV APPLICATION_SOURCES="$GOPATH_SOURCES/milobella.com/gitlab/$PROJECT_NAME/$MODULE_NAME"
+ENV APPLICATION_SOURCES="$GOPATH_SOURCES/github.com/$PROJECT_NAME/$MODULE_NAME"
 COPY . $APPLICATION_SOURCES
 WORKDIR $APPLICATION_SOURCES
 
