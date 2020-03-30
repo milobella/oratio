@@ -4,6 +4,9 @@
 ########################################################################
 ### builder stage : Build the golang application in src folder
 FROM golang:1.13.1 as builder
+
+ARG MODULE_NAME
+
 COPY . /src
 WORKDIR /src
 RUN go build -o bin/main cmd/$MODULE_NAME/main.go
