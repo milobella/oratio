@@ -3,7 +3,7 @@
 
 ########################################################################
 ### builder stage : Build the golang application in src folder
-FROM golang:1.13.1 as builder
+FROM golang:1.14-alpine as builder
 
 ARG MODULE_NAME
 
@@ -44,8 +44,8 @@ ENV CONFIGURATION_PATH=/etc/$MODULE_NAME.toml
 ENV BINARY_PATH=/bin/$MODULE_NAME
 
 COPY --from=builder /src/config/$MODULE_NAME.toml ${CONFIGURATION_PATH}
-COPY --from=builder /src/bin/main /bin/$MODULE_NAME
+COPY --from=builder /src/bin/main $BINARY_PATH
 
 # Build the main command
-CMD /bin/$MODULE_NAME --configfile ${CONFIGURATION_PATH}
+CMD .$BINARY_PATH --configfile $CONFIGURATION_PATH 
 ########################################################################
