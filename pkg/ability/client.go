@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/milobella/oratio/pkg/anima"
+	"github.com/sirupsen/logrus"
 )
 
 // Client : Ability HTTP client
