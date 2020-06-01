@@ -23,7 +23,3 @@ $ bin/oratio -c config/oratio.toml
 ```bash
 $ curl -i -X POST http://localhost:9100/talk/text -d '{"text": "Quelle heure il est ? "}'
 ```
-
-## CHANGELOGS
-- [Application changelog](./CHANGELOG.md)
-- [Helm chart changelog](./helm/oratio/CHANGELOG.md)

@@ -11,7 +11,7 @@ type AbilityService struct {
 }
 
 // RequestAbility: Call ability corresponding to the intent resolved by cerebro.
-func (acr *AbilityService) RequestAbility(nlu cerebro.NLU, context ability.Context) (anima.NLG, interface{}, bool, ability.Context) {
+func (acr *AbilityService) RequestAbility(nlu cerebro.NLU, context ability.Context, device ability.Device) (anima.NLG, interface{}, bool, ability.Context) {
 
 	intentOrAbility := nlu.GetBestIntentOr(context.LastAbility)
 
@@ -21,7 +21,7 @@ func (acr *AbilityService) RequestAbility(nlu cerebro.NLU, context ability.Conte
 	}
 
 	if client, ok := acr.Clients[intentOrAbility]; ok {
-		return doRequest(client, ability.Request{Nlu: nlu, Context: context})
+		return doRequest(client, ability.Request{Nlu: nlu, Context: context, Device: device})
 	}
 
 	return anima.NLG{Sentence: "Oups !"}, nil, false, ability.Context{}
