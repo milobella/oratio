@@ -24,7 +24,7 @@ func (trh *TextRequestHandler) HandleTextRequest(w http.ResponseWriter, r *http.
 
 	// Execute the processing flow
 	nlu := trh.CerebroClient.UnderstandText(requestBody.Text)
-	nlg, visu, autoReprompt, context := trh.AbilityService.RequestAbility(nlu, requestBody.Context)
+	nlg, visu, autoReprompt, context := trh.AbilityService.RequestAbility(nlu, requestBody.Context, requestBody.Device)
 	vocal := trh.AnimaClient.GenerateSentence(nlg)
 
 	// Build the body of the response
