@@ -11,5 +11,6 @@ require (
 	github.com/sirupsen/logrus v1.5.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/urfave/negroni v1.0.0 // indirect
+	go.mongodb.org/mongo-driver v1.3.4
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )

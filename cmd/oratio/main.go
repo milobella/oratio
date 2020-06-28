@@ -7,12 +7,14 @@ import (
 	"github.com/milobella/oratio/internal/auth"
 	"github.com/milobella/oratio/internal/config"
 	"github.com/milobella/oratio/internal/logging"
+	"github.com/milobella/oratio/internal/models"
 	"github.com/milobella/oratio/internal/server"
 	"github.com/milobella/oratio/pkg/ability"
 	"github.com/milobella/oratio/pkg/anima"
 	"github.com/milobella/oratio/pkg/cerebro"
 	"github.com/sirupsen/logrus"
 	"os"
+	"time"
 )
 
 //TODO: use this init function to initialize variables instead of initialize on top
@@ -30,12 +32,13 @@ func init() {
 
 // Configuration : object architectured by gonfig lib to store the configuration when we use
 type Configuration struct {
-	Server     config.ServerConfiguration
-	Cerebro    config.CerebroConfiguration
-	Anima      config.AnimaConfiguration
-	Abilities  []config.AbilityConfiguration
-	AppSecret  string `id:"app_secret" env:"APP_SECRET" default:""`
-	ConfigFile string `short:"c"`
+	Server       config.ServerConfiguration
+	Cerebro      config.CerebroConfiguration
+	Anima        config.AnimaConfiguration
+	Abilities    []config.AbilityConfiguration
+	AbilityMongo config.AbilityMongoConfiguration
+	AppSecret    string `id:"app_secret" env:"APP_SECRET" default:""`
+	ConfigFile   string `short:"c"`
 }
 
 // fun String() : Serialization function of Configuration (for logging)
@@ -53,7 +56,6 @@ var cerebroClient *cerebro.Client
 var animaClient *anima.Client
 var abilityClientsMap map[string]*ability.Client
 
-// fun main()
 func main() {
 
 	conf = &Configuration{}
@@ -69,7 +71,7 @@ func main() {
 	})
 
 	if err != nil {
-		logrus.Fatalf("Error reading config : %s", err)
+		logrus.WithError(err).Fatalf("Error reading config.")
 	} else {
 		logrus.Infof("Successfully readen configuration file : %s", conf.ConfigFile)
 		logrus.Debugf("-> %+v", conf)
@@ -87,7 +89,17 @@ func main() {
 		}
 	}
 
-	// Build the handler
+	// Build the ability handler
+	abilityDAO, err := models.NewAbilityDAOMongo(conf.AbilityMongo.Url, "oratio", 10 * time.Second)
+	if err != nil {
+		logrus.WithError(err).Fatalf("Error initializing the Ability DAO.")
+	}
+	abilityHandler := &server.AbilityRequestHandler{
+		AbilitDAO: abilityDAO,
+	}
+
+	// Build the text handler
+	// TODO: for the moment, abilities are only taken from the configuration but it should take it from the database
 	abilityService := &server.AbilityService{Clients: abilityClientsMap}
 	textHandler := server.TextRequestHandler{
 		CerebroClient:  cerebroClient,
@@ -109,6 +121,7 @@ func main() {
 	}
 
 	router.HandleFunc("/talk/text", textHandler.HandleTextRequest).Methods("POST")
+	router.HandleFunc("/abilities", abilityHandler.HandleAbilityRequest).Methods("POST", "GET")
 
 	srv := server.Server{Router: router, Port: conf.Server.Port}
 	srv.Run()
