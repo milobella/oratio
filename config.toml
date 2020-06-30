@@ -10,6 +10,9 @@ port = 9444
 host = "0.0.0.0"
 port = 9333
 
+[abilities_database]
+mongo_url = "mongodb+srv://localhost:27017"
+
 [[abilities]]
     name = "cinema"
     intents = ["LAST_SHOWTIME"]
