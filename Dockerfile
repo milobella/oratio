@@ -40,12 +40,12 @@ LABEL org.label-schema.version=$BUILD_VERSION
 LABEL org.label-schema.docker.cmd="docker run -it $DOCKER_IMAGE:$BUILD_VERSION"
 
 # Two files are necessary from the build stage : the configuration and the binary
-ENV CONFIGURATION_PATH=/etc/$MODULE_NAME.toml
+ENV CONFIGURATION_PATH=/etc/$MODULE_NAME/config.toml
 ENV BINARY_PATH=/bin/$MODULE_NAME
 
-COPY --from=builder /src/config/$MODULE_NAME.toml ${CONFIGURATION_PATH}
+COPY --from=builder /src/config.toml ${CONFIGURATION_PATH}
 COPY --from=builder /src/bin/main $BINARY_PATH
 
 # Build the main command
-CMD .$BINARY_PATH --configfile $CONFIGURATION_PATH 
+CMD .$BINARY_PATH
 ########################################################################
