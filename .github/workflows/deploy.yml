@@ -1,3 +1,4 @@
+name: Deploy CI
 on:
   push:
     tags:
@@ -17,9 +18,16 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build image
+      - name: Build production image
         if: success()
-        run: docker build -t ${GITHUB_REPOSITORY}:latest -t ${GITHUB_REPOSITORY}:${IMAGE_TAG} --build-arg PROJECT_NAME=milobella --build-arg MODULE_NAME=oratio .
+        run:  |
+          docker build -t ${GITHUB_REPOSITORY}:latest -t ${GITHUB_REPOSITORY}:${IMAGE_TAG} \
+                  --build-arg PROJECT_NAME=milobella \
+                  --build-arg BUILD_VERSION=${IMAGE_TAG} \
+                  --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+                  --build-arg MODULE_NAME="oratio" \
+                  --build-arg MODULE_DESCRIPTION="Http server which is the main and only entry point of Milobella." \
+                  .
 
       - name: Push tag to docker registry
         if: success()

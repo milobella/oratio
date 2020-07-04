@@ -12,7 +12,7 @@ import (
 type TextRequestHandler struct {
 	CerebroClient  *cerebro.Client
 	AnimaClient    *anima.Client
-	AbilityService *AbilityService
+	AbilityService AbilityService
 }
 
 func (rh *TextRequestHandler) HandleTextRequest(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +28,7 @@ func (rh *TextRequestHandler) HandleTextRequest(w http.ResponseWriter, r *http.R
 	nlg, visu, autoReprompt, context := rh.AbilityService.RequestAbility(nlu, requestBody.Context, requestBody.Device)
 	vocal := rh.AnimaClient.GenerateSentence(nlg)
 
-	// Build the body of the response
+	// Build the response's body
 	responseBody := ResponseBody{Vocal: vocal, Visu: visu, AutoReprompt: autoReprompt, Context: context}
 
 	// Write it on the http response

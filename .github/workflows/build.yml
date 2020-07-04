@@ -1,0 +1,28 @@
+name: Build CI
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Build dev image
+        if: success()
+        run:  |
+          docker build -t ${GITHUB_REPOSITORY}:dev \
+                  --build-arg PROJECT_NAME=milobella \
+                  --build-arg BUILD_VERSION=dev \
+                  --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+                  --build-arg MODULE_NAME="oratio" \
+                  --build-arg MODULE_DESCRIPTION="Http server which is the main and only entry point of Milobella." \
+                  .
