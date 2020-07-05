@@ -1,4 +1,0 @@
-apiVersion: v1
-description: Helm Chart of oratio project
-name: oratio
-version: 0.1.3

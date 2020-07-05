@@ -2,7 +2,9 @@ package config
 
 import (
 	"encoding/json"
+	"github.com/milobella/oratio/internal/models"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 // Configuration
@@ -10,7 +12,8 @@ type Configuration struct {
 	Server            ServerConfiguration
 	Cerebro           CerebroConfiguration
 	Anima             AnimaConfiguration
-	Abilities         []AbilityConfiguration
+	Abilities         []models.Ability
+	AbilitiesCache    AbilitiesCacheConfiguration    `mapstructure:"abilities_cache"`
 	AbilitiesDatabase AbilitiesDatabaseConfiguration `mapstructure:"abilities_database"`
 	AppSecret         string                         `mapstructure:"app_secret"`
 }
@@ -42,10 +45,7 @@ type AnimaConfiguration struct {
 type AbilitiesDatabaseConfiguration struct {
 	MongoUrl string `mapstructure:"mongo_url"`
 }
-
-type AbilityConfiguration struct {
-	Name    string
-	Host    string
-	Port    int
-	Intents []string
+type AbilitiesCacheConfiguration struct {
+	Expiration      time.Duration
+	CleanupInterval time.Duration `mapstructure:"cleanup_interval"`
 }

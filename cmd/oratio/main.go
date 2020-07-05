@@ -7,7 +7,6 @@ import (
 	"github.com/milobella/oratio/internal/logging"
 	"github.com/milobella/oratio/internal/models"
 	"github.com/milobella/oratio/internal/server"
-	"github.com/milobella/oratio/pkg/ability"
 	"github.com/milobella/oratio/pkg/anima"
 	"github.com/milobella/oratio/pkg/cerebro"
 	"github.com/sirupsen/logrus"
@@ -28,10 +27,6 @@ func init() {
 	logrus.SetLevel(logrus.DebugLevel)
 }
 
-var cerebroClient *cerebro.Client
-var animaClient *anima.Client
-var abilityClientsMap map[string]*ability.Client
-
 func main() {
 	// Read configuration
 	conf, err := config.ReadConfiguration()
@@ -43,16 +38,8 @@ func main() {
 	}
 
 	// Initialize clients
-	cerebroClient = cerebro.NewClient(conf.Cerebro.Host, conf.Cerebro.Port)
-	animaClient = anima.NewClient(conf.Anima.Host, conf.Anima.Port)
-	abilityClientsMap = make(map[string]*ability.Client)
-	// TODO: Abilities should be a dynamic data
-	for _, ac := range conf.Abilities {
-		abilityClient := ability.NewClient(ac.Host, ac.Port, ac.Name)
-		for _, intent := range ac.Intents {
-			abilityClientsMap[intent] = abilityClient
-		}
-	}
+	cerebroClient := cerebro.NewClient(conf.Cerebro.Host, conf.Cerebro.Port)
+	animaClient := anima.NewClient(conf.Anima.Host, conf.Anima.Port)
 
 	// Build the ability handler
 	abilityDAO, err := models.NewAbilityDAOMongo(conf.AbilitiesDatabase.MongoUrl, "oratio", 10 * time.Second)
@@ -64,8 +51,7 @@ func main() {
 	}
 
 	// Build the text handler
-	// TODO: for the moment, abilities are only taken from the configuration but it should take it from the database
-	abilityService := &server.AbilityService{Clients: abilityClientsMap}
+	abilityService := server.NewAbilityService(abilityDAO, conf.Abilities, conf.AbilitiesCache.Expiration, conf.AbilitiesCache.CleanupInterval)
 	textHandler := server.TextRequestHandler{
 		CerebroClient:  cerebroClient,
 		AnimaClient:    animaClient,

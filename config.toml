@@ -11,7 +11,11 @@ host = "0.0.0.0"
 port = 9333
 
 [abilities_database]
-mongo_url = "mongodb+srv://localhost:27017"
+mongo_url = "mongodb://localhost:27017"
+
+[abilities_cache]
+expiration = "24h"
+cleanup_interval = "1h"
 
 [[abilities]]
     name = "cinema"

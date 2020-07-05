@@ -18,6 +18,7 @@ type Ability struct {
 type AbilityDAO interface {
 	CreateOrUpdate(ability *Ability) (*Ability, error)
 	GetAll() ([]*Ability, error)
+	GetByIntent(intent string) ([]*Ability, error)
 }
 
 const (
@@ -60,9 +61,19 @@ func (dao *abilityDAOMongo) GetAll() ([]*Ability, error) {
 	if err = cursor.All(ctx, &results); err != nil {
 		return []*Ability{}, err
 	}
-	//abilities := make([]*Ability, len(results))
-	//for _, result := range results {
-	//	abilities = append(abilities, result)
-	//}
+	return results, nil
+}
+
+func (dao *abilityDAOMongo) GetByIntent(intent string) ([]*Ability, error) {
+	collection := dao.client.Database(dao.database).Collection(mongoDBCollection)
+	ctx, _ := context.WithTimeout(context.Background(), dao.timeout)
+	cursor, err := collection.Find(ctx, bson.M{"intents": intent})
+	if err != nil {
+		return []*Ability{}, err
+	}
+	var results	[]*Ability
+	if err = cursor.All(ctx, &results); err != nil {
+		return []*Ability{}, err
+	}
 	return results, nil
 }
