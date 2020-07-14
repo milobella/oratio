@@ -38,5 +38,5 @@ $ curl -iv -X POST http://localhost:9100/abilities -d '{"name": "clock", "intent
 
 ### Get all registered abilities
 ```bash
-$ curl -iv -X POST http://localhost:9100/abilities -d '{"name": "clock", "intents":["GET_TIME"], "host": "localhost", "port": 10300}'
+$ curl -iv -X GET http://localhost:9100/abilities
 ```
