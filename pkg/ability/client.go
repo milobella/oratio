@@ -14,8 +14,8 @@ import (
 
 // Client : Ability HTTP client
 type Client struct {
-	host   string
-	port   int
+	Host   string
+	Port   int
 	url    string
 	client http.Client
 	Name   string
@@ -24,7 +24,7 @@ type Client struct {
 // NewClient : ctor
 func NewClient(host string, port int, name string) *Client {
 	url := fmt.Sprintf("http://%s:%d", host, port)
-	return &Client{host: host, port: port, url: url, client: http.Client{}, Name: name}
+	return &Client{Host: host, Port: port, url: url, client: http.Client{}, Name: name}
 }
 
 func (c Client) makeRequest(request Request) (response Response, err error) {
