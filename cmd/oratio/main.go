@@ -1,8 +1,10 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/milobella/oratio/internal/auth"
+	"fmt"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"github.com/milobella/oratio/internal"
 	"github.com/milobella/oratio/internal/config"
 	"github.com/milobella/oratio/internal/logging"
 	"github.com/milobella/oratio/internal/models"
@@ -14,7 +16,6 @@ import (
 	"time"
 )
 
-//TODO: use this init function to initialize variables instead of initialize on top
 func init() {
 	// Log as JSON instead of the default ASCII formatter.
 	logrus.SetFormatter(&logrus.TextFormatter{})
@@ -27,6 +28,9 @@ func init() {
 	logrus.SetLevel(logrus.DebugLevel)
 }
 
+//TODO simplify the main
+// - making some builders to initialize handlers
+// - reading configuration in one line (error handling inside the ReadConfiguration function
 func main() {
 	// Read configuration
 	conf, err := config.ReadConfiguration()
@@ -41,39 +45,46 @@ func main() {
 	cerebroClient := cerebro.NewClient(conf.Cerebro.Host, conf.Cerebro.Port)
 	animaClient := anima.NewClient(conf.Anima.Host, conf.Anima.Port)
 
-	// Build the ability handler
-	abilityDAO, err := models.NewAbilityDAOMongo(conf.AbilitiesDatabase.MongoUrl, "oratio", 10 * time.Second)
+	// Build the ability service
+	abilityDAO, err := models.NewAbilityDAOMongo(conf.AbilitiesDatabase.MongoUrl, "oratio", 3*time.Second)
 	if err != nil {
 		logrus.WithError(err).Fatalf("Error initializing the Ability DAO.")
 	}
+	abilityService := internal.NewAbilityService(abilityDAO, conf.Abilities, conf.AbilitiesCache.Expiration, conf.AbilitiesCache.CleanupInterval)
+
+	// Build the ability handler
 	abilityHandler := &server.AbilityRequestHandler{
 		AbilitDAO: abilityDAO,
+		AbilityService: abilityService,
 	}
 
 	// Build the text handler
-	abilityService := server.NewAbilityService(abilityDAO, conf.Abilities, conf.AbilitiesCache.Expiration, conf.AbilitiesCache.CleanupInterval)
 	textHandler := server.TextRequestHandler{
 		CerebroClient:  cerebroClient,
 		AnimaClient:    animaClient,
 		AbilityService: abilityService,
 	}
 
-	// Initialize the server's router
-	router := mux.NewRouter()
+	// Initialize an echo server
+	e := echo.New()
 
-	// Register the logging requests middleware
-	logMiddleware := logging.InitializeLoggingMiddleware()
-	router.Use(logMiddleware.Handle)
-
-	// Register the JWT authentication middleware
+	// Register middleware
+	e.Use(logging.InitializeLoggingMiddleware().Handle)
 	if len(conf.AppSecret) > 0 {
-		jwtMiddleware := auth.InitializeJWTMiddleware(conf.AppSecret)
-		router.Use(jwtMiddleware.Handler)
+		// TODO: use custom claim to retrieve scopes and other user info (https://echo.labstack.com/cookbook/jwt)
+		e.Use(middleware.JWT([]byte(conf.AppSecret)))
 	}
 
-	router.HandleFunc("/talk/text", textHandler.HandleTextRequest).Methods("POST")
-	router.HandleFunc("/abilities", abilityHandler.HandleAbilityRequest).Methods("POST", "GET")
+	// Register handlers
+	apiV1 := e.Group("/api/v1")
+	apiV1.POST("/talk/text", textHandler.HandleTextRequest)
+	apiV1.GET("/abilities", abilityHandler.HandleGetAllAbilityRequest)
+	apiV1.POST("/abilities", abilityHandler.HandleCreateAbilityRequest)
 
-	srv := server.Server{Router: router, Port: conf.Server.Port}
-	srv.Run()
+	// Keep the old route to ensure the compatibility
+	// TODO: remove old route after the migration is performed
+	e.POST("/talk/text", textHandler.HandleTextRequest)
+
+	// Run the echo server
+	logrus.Fatal(e.Start(fmt.Sprintf(":%d", conf.Server.Port)))
 }

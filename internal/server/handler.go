@@ -1,25 +1,24 @@
 package server
 
 import (
-	"encoding/json"
+	"github.com/labstack/echo"
+	"github.com/milobella/oratio/internal"
 	"github.com/milobella/oratio/internal/models"
 	"github.com/milobella/oratio/pkg/anima"
 	"github.com/milobella/oratio/pkg/cerebro"
-	"io/ioutil"
 	"net/http"
 )
 
 type TextRequestHandler struct {
 	CerebroClient  *cerebro.Client
 	AnimaClient    *anima.Client
-	AbilityService AbilityService
+	AbilityService internal.AbilityService
 }
 
-func (rh *TextRequestHandler) HandleTextRequest(w http.ResponseWriter, r *http.Request) {
+func (rh *TextRequestHandler) HandleTextRequest(c echo.Context) (err error) {
 	// Read the request
-	requestBody, err := rh.readTextRequest(r)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	requestBody := new(RequestBody)
+	if err = c.Bind(requestBody); err != nil {
 		return
 	}
 
@@ -29,76 +28,56 @@ func (rh *TextRequestHandler) HandleTextRequest(w http.ResponseWriter, r *http.R
 	vocal := rh.AnimaClient.GenerateSentence(nlg)
 
 	// Build the response's body
-	responseBody := ResponseBody{Vocal: vocal, Visu: visu, AutoReprompt: autoReprompt, Context: context}
+	responseBody := &ResponseBody{Vocal: vocal, Visu: visu, AutoReprompt: autoReprompt, Context: context}
 
 	// Write it on the http response
-	if err = json.NewEncoder(w).Encode(responseBody); err != nil {
-		http.Error(w, err.Error(), 500)
-	}
-}
-
-func (rh *TextRequestHandler) readTextRequest(r *http.Request) (req RequestBody, err error) {
-	b, err := ioutil.ReadAll(r.Body)
-	defer func() {
-		_ = r.Body.Close()
-	}()
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(b, &req)
-	return
+	return c.JSON(http.StatusOK, responseBody)
 }
 
 type AbilityRequestHandler struct {
 	AbilitDAO models.AbilityDAO
+	AbilityService internal.AbilityService
 }
 
-func (rh *AbilityRequestHandler) HandleAbilityRequest(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "POST":
-		rh.handleCreateAbilityRequest(w, r)
-		break
-	case "GET":
-		rh.handleGetAllAbilityRequest(w, r)
-		break
+func (rh *AbilityRequestHandler) HandleGetAllAbilityRequest(c echo.Context) (err error) {
+	from := c.QueryParam("from")
+	switch from {
+	case "cache":
+		if result, err := rh.AbilityService.GetCacheAbilities(); err != nil {
+			return echo.NewHTTPError(500, err.Error())
+		} else {
+			return c.JSON(http.StatusOK, result)
+		}
+	case "database":
+		if result, err := rh.AbilityService.GetDatabaseAbilities(); err != nil {
+			return echo.NewHTTPError(500, err.Error())
+		} else {
+			return c.JSON(http.StatusOK, result)
+		}
+	case "config":
+		if result, err := rh.AbilityService.GetConfigAbilities(); err != nil {
+			return echo.NewHTTPError(500, err.Error())
+		} else {
+			return c.JSON(http.StatusOK, result)
+		}
+	default:
+		if result, err := rh.AbilityService.GetAllAbilities(); err != nil {
+			return echo.NewHTTPError(500, err.Error())
+		} else {
+			return c.JSON(http.StatusOK, result)
+		}
 	}
 }
 
-func (rh *AbilityRequestHandler) handleCreateAbilityRequest(w http.ResponseWriter, r *http.Request) {
-	ability, err := rh.readAbilityRequest(r)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+func (rh *AbilityRequestHandler) HandleCreateAbilityRequest(c echo.Context) (err error) {
+	ability := new(models.Ability)
+	if err = c.Bind(ability); err != nil {
 		return
 	}
 
-	if ability == nil {
-		http.Error(w, "You gave an empty ability", 400)
-		return
+	if result, err := rh.AbilitDAO.CreateOrUpdate(ability); err != nil {
+		return echo.NewHTTPError(500, err.Error())
+	} else {
+		return c.JSON(http.StatusOK, result)
 	}
-	result, err := rh.AbilitDAO.CreateOrUpdate(ability)
-	if err = json.NewEncoder(w).Encode(result); err != nil {
-		http.Error(w, err.Error(), 500)
-	}
-
-}
-
-func (rh *AbilityRequestHandler) handleGetAllAbilityRequest(w http.ResponseWriter, r *http.Request) {
-	result, err := rh.AbilitDAO.GetAll()
-	if err = json.NewEncoder(w).Encode(result); err != nil {
-		http.Error(w, err.Error(), 500)
-	}
-}
-
-func (rh *AbilityRequestHandler) readAbilityRequest(r *http.Request) (req *models.Ability, err error) {
-	b, err := ioutil.ReadAll(r.Body)
-	defer func() {
-		_ = r.Body.Close()
-	}()
-	if err != nil {
-		return
-	}
-
-	var result models.Ability
-	err = json.Unmarshal(b, &result)
-	return &result, err
 }

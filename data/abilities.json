@@ -1,0 +1,8 @@
+[
+  {
+    "name": "clock",
+    "intents": ["GET_TIME"],
+    "host": "localhost",
+    "port": 10200
+  }
+]

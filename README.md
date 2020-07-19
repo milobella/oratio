@@ -28,15 +28,26 @@ A configuration example can be found in [config.toml](./config.toml).
 ## Examples of requests
 ### Talk to oratio
 ```bash
-$ curl -i -X POST http://localhost:9100/talk/text -d '{"text": "Quelle heure il est ? "}'
+$ curl -iv -H "Content-Type: application/json" -X POST http://localhost:9100/api/v1/talk/text -d '{"text": "Quelle heure il est ? "}'
 ```
 
 ### Register a new ability
 ```bash
-$ curl -iv -X POST http://localhost:9100/abilities -d '{"name": "clock", "intents":["GET_TIME"], "host": "localhost", "port": 10300}'
+$ curl -iv -H "Content-Type: application/json" -X POST http://localhost:9100/api/v1/abilities -d '{"name": "clock", "intents":["GET_TIME"], "host": "localhost", "port": 10300}'
 ```
 
-### Get all registered abilities
+### Get all registered abilities from every source (cache, database, config)
 ```bash
-$ curl -iv -X GET http://localhost:9100/abilities
+$ curl -iv -X GET http://localhost:9100/api/v1/abilities
+```
+
+### Get abilities from cache, database, or config
+```bash
+$ curl -iv -X GET http://localhost:9100/api/v1/abilities?from=cache
+```
+```bash
+$ curl -iv -X GET http://localhost:9100/api/v1/abilities?from=database
+```
+```bash
+$ curl -iv -X GET http://localhost:9100/api/v1/abilities?from=config
 ```

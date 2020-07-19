@@ -1,6 +1,7 @@
-package server
+package internal
 
 import (
+	"fmt"
 	"github.com/milobella/oratio/internal/models"
 	"github.com/milobella/oratio/pkg/ability"
 	"github.com/milobella/oratio/pkg/anima"
@@ -13,8 +14,18 @@ import (
 // Used to compute an approximative size of the map that will welcome the clients (one client by ability and by intent)
 const approximativeIntentsByAbility = 3
 
+type Abilities struct {
+	Cache    []*models.Ability `json:"cache"`
+	Database []*models.Ability `json:"database"`
+	Config   []*models.Ability `json:"config"`
+}
+
 type AbilityService interface {
 	RequestAbility(nlu cerebro.NLU, context ability.Context, device ability.Device) (anima.NLG, interface{}, bool, ability.Context)
+	GetCacheAbilities() ([]*models.Ability, error)
+	GetDatabaseAbilities() ([]*models.Ability, error)
+	GetConfigAbilities() ([]*models.Ability, error)
+	GetAllAbilities() (*Abilities, error)
 }
 
 // abilityClients is used to store and index clients computed from abilities. It is used only for abilities coming
@@ -63,6 +74,72 @@ func (a *abilityServiceImpl) RequestAbility(nlu cerebro.NLU, context ability.Con
 	}
 
 	return anima.NLG{Sentence: "Oups !"}, nil, false, ability.Context{}
+}
+
+// GetCacheAbilities: Fetch the abilities from the cache.
+func (a *abilityServiceImpl) GetCacheAbilities() ([]*models.Ability, error) {
+	var abilities []*models.Ability
+	for intent, item := range a.clientsCache.Items() {
+		client, ok := item.Object.(*ability.Client)
+		if !ok {
+			return nil, fmt.Errorf("error casting cache entry into %T", &ability.Client{})
+		}
+		abilities = append(abilities, &models.Ability{
+			Name:    client.Name,
+			Host:    client.Host,
+			Port:    client.Port,
+			Intents: []string{intent},
+		})
+	}
+	if abilities == nil {
+		return []*models.Ability{}, nil
+	} else {
+		return abilities, nil
+	}
+}
+
+// GetDatabaseAbilities: Fetch the abilities from the database.
+func (a *abilityServiceImpl) GetDatabaseAbilities() ([]*models.Ability, error) {
+	return a.dao.GetAll()
+}
+
+// GetConfigAbilities: Fetch the abilities from the configuration.
+func (a *abilityServiceImpl) GetConfigAbilities() ([]*models.Ability, error) {
+	var abilities []*models.Ability
+	for intent, client := range a.abilityClientsFromConfig {
+		abilities = append(abilities, &models.Ability{
+			Name:    client.Name,
+			Host:    client.Host,
+			Port:    client.Port,
+			Intents: []string{intent},
+		})
+	}
+	if abilities == nil {
+		return []*models.Ability{}, nil
+	} else {
+		return abilities, nil
+	}
+}
+
+// GetAllAbilities: Fetch the abilities from the every places (cache, database, config).
+func (a *abilityServiceImpl) GetAllAbilities() (*Abilities, error) {
+	cacheAbilities, err := a.GetCacheAbilities()
+	if err != nil {
+		return nil, err
+	}
+	databaseAbilities, err := a.GetDatabaseAbilities()
+	if err != nil {
+		return nil, err
+	}
+	configAbilities, err := a.GetConfigAbilities()
+	if err != nil {
+		return nil, err
+	}
+	return &Abilities{
+		Cache:    cacheAbilities,
+		Database: databaseAbilities,
+		Config:   configAbilities,
+	}, nil
 }
 
 func doRequest(client *ability.Client, request ability.Request) (anima.NLG, interface{}, bool, ability.Context) {
