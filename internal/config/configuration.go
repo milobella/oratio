@@ -35,11 +35,13 @@ type ServerConfiguration struct {
 type CerebroConfiguration struct {
 	Host string
 	Port int
+	UnderstandEndpoint string `mapstructure:"understand_endpoint"`
 }
 
 type AnimaConfiguration struct {
 	Host string
 	Port int
+	RestituteEndpoint string `mapstructure:"restitute_endpoint"`
 }
 
 type AbilitiesDatabaseConfiguration struct {

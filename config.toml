@@ -5,10 +5,12 @@ log_level = "<root>=INFO"
 [cerebro]
 host = "0.0.0.0"
 port = 9444
+understand_endpoint = "/understand"
 
 [anima]
 host = "0.0.0.0"
 port = 9333
+restitute_endpoint = "/api/v1/restitute"
 
 [abilities_database]
 mongo_url = "mongodb://localhost:27017"

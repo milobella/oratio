@@ -42,8 +42,8 @@ func main() {
 	}
 
 	// Initialize clients
-	cerebroClient := cerebro.NewClient(conf.Cerebro.Host, conf.Cerebro.Port)
-	animaClient := anima.NewClient(conf.Anima.Host, conf.Anima.Port)
+	cerebroClient := cerebro.NewClient(conf.Cerebro.Host, conf.Cerebro.Port, conf.Cerebro.UnderstandEndpoint)
+	animaClient := anima.NewClient(conf.Anima.Host, conf.Anima.Port, conf.Anima.RestituteEndpoint)
 
 	// Build the ability service
 	abilityDAO, err := models.NewAbilityDAOMongo(conf.AbilitiesDatabase.MongoUrl, "oratio", 3*time.Second)

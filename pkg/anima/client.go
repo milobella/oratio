@@ -12,20 +12,36 @@ import (
 )
 
 type Client struct {
-	host   string
-	port   int
-	url    string
-	name   string
-	client http.Client
+	host              string
+	port              int
+	url               string
+	name              string
+	client            http.Client
+	restituteEndpoint string
 }
 
-func NewClient(host string, port int) *Client {
+// buildEndpoint: Ensure that endpoint start with /
+func buildEndpoint(endpoint string) string {
+	if !strings.HasPrefix(endpoint, "/") {
+		return "/" + endpoint
+	}
+	return endpoint
+}
+
+func NewClient(host string, port int, restituteEndpoint string) *Client {
 	url := fmt.Sprintf("http://%s:%d", host, port)
-	return &Client{host: host, port: port, url: url, client: http.Client{}, name: "anima"}
+	return &Client{
+		host: host,
+		port: port,
+		url: url,
+		client: http.Client{},
+		name: "anima",
+		restituteEndpoint: buildEndpoint(restituteEndpoint),
+	}
 }
 
 func (c Client) makeRequest(nlg NLG) (result string, err error) {
-	restituteEndpoint := strings.Join([]string{c.url, "restitute"}, "/")
+	restituteEndpoint := c.url + c.restituteEndpoint
 	jsonNLG, err := json.Marshal(nlg)
 	if err != nil {
 		logrus.WithField("client", c.name).Error(err)

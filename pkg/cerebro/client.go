@@ -12,16 +12,32 @@ import (
 )
 
 type Client struct {
-	host   string
-	port   int
-	url    string
-	client http.Client
-	name   string
+	host               string
+	port               int
+	url                string
+	client             http.Client
+	name               string
+	understandEndpoint string
 }
 
-func NewClient(host string, port int) *Client {
+// buildEndpoint: Ensure that endpoint start with /
+func buildEndpoint(endpoint string) string {
+	if !strings.HasPrefix(endpoint, "/") {
+		return "/" + endpoint
+	}
+	return endpoint
+}
+
+func NewClient(host string, port int, understandEndpoint string) *Client {
 	url := fmt.Sprintf("http://%s:%d", host, port)
-	return &Client{host: host, port: port, url: url, client: http.Client{}, name: "cerebro"}
+	return &Client{
+		host:   host,
+		port:   port,
+		url:    url,
+		client: http.Client{},
+		name:   "cerebro",
+		understandEndpoint: buildEndpoint(understandEndpoint),
+	}
 }
 
 func (c Client) UnderstandText(t string) (result NLU) {
@@ -46,7 +62,7 @@ func (c Client) bestNLU(result *NLU) {
 }
 
 func (c Client) makeRequest(query string) (result NLU, err error) {
-	understandEndpoint := strings.Join([]string{c.url, "understand"}, "/")
+	understandEndpoint := c.url + c.understandEndpoint
 	reqBody := []byte(fmt.Sprintf("{\"text\": \"%s\"}", query))
 	req, err := http.NewRequest("POST", understandEndpoint, bytes.NewBuffer(reqBody))
 	if err != nil {
@@ -68,7 +84,7 @@ func (c Client) makeRequest(query string) (result NLU, err error) {
 		logrus.WithField("client", c.name).Error(err)
 		return
 	}
-	
+
 	logrus.WithField("client", c.name).Debug(string(body))
 
 	err = json.Unmarshal(body, &result)
