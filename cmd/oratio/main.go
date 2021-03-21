@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/milobella/oratio/internal"
 	"github.com/milobella/oratio/internal/config"
 	"github.com/milobella/oratio/internal/logging"
 	"github.com/milobella/oratio/internal/models"
 	"github.com/milobella/oratio/internal/server"
+	"github.com/milobella/oratio/internal/service"
 	"github.com/milobella/oratio/pkg/anima"
 	"github.com/milobella/oratio/pkg/cerebro"
 	"github.com/sirupsen/logrus"
@@ -50,7 +50,7 @@ func main() {
 	if err != nil {
 		logrus.WithError(err).Fatalf("Error initializing the Ability DAO.")
 	}
-	abilityService := internal.NewAbilityService(abilityDAO, conf.Abilities, conf.AbilitiesCache.Expiration, conf.AbilitiesCache.CleanupInterval)
+	abilityService := service.NewAbilityService(abilityDAO, conf.Abilities, conf.AbilitiesCache.Expiration, conf.AbilitiesCache.CleanupInterval)
 
 	// Build the ability handler
 	abilityHandler := &server.AbilityRequestHandler{
