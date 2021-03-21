@@ -6,6 +6,7 @@ import (
 	"github.com/milobella/oratio/internal/service"
 	"github.com/milobella/oratio/pkg/anima"
 	"github.com/milobella/oratio/pkg/cerebro"
+	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -41,6 +42,11 @@ type AbilityRequestHandler struct {
 
 func (rh *AbilityRequestHandler) HandleGetAllAbilityRequest(c echo.Context) (err error) {
 	from := c.QueryParam("from")
+	defer func() {
+		if err != nil {
+			logrus.WithError(err).WithField("from", from).Error("An error occurred while getting Abilities")
+		}
+	}()
 	switch from {
 	case "cache":
 		if result, err := rh.AbilityService.GetCacheAbilities(); err != nil {
