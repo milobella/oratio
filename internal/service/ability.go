@@ -75,7 +75,7 @@ func (a *abilityServiceImpl) RequestAbility(nlu cerebro.NLU, context ability.Con
 	}
 
 	if client, ok := a.resolveClient(intentOrAbility); ok {
-		if response, err := client.CallAbility(ability.Request{Nlu: nlu, Context: context, Device: device}); err != nil {
+		if response, err := client.CallAbility(ability.Request{Nlu: nlu, Context: context, Device: device}); err == nil {
 			if err = a.clientsCache.Add(intentOrAbility, client, cache.DefaultExpiration); err != nil {
 				logrus.
 					WithError(err).
