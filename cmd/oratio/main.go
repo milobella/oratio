@@ -26,6 +26,8 @@ func init() {
 
 	// TODO: read it in the config when move to viper
 	logrus.SetLevel(logrus.DebugLevel)
+
+	logrus.SetReportCaller(true)
 }
 
 //TODO simplify the main

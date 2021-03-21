@@ -144,14 +144,17 @@ func (a *abilityServiceImpl) GetConfigAbilities() ([]*models.Ability, error) {
 func (a *abilityServiceImpl) GetAllAbilities() (*Abilities, error) {
 	cacheAbilities, err := a.GetCacheAbilities()
 	if err != nil {
+		logrus.WithError(err).Error("An error occurred while fetching Abilities from cache")
 		return nil, err
 	}
 	databaseAbilities, err := a.GetDatabaseAbilities()
 	if err != nil {
+		logrus.WithError(err).Error("An error occurred while fetching Abilities from database")
 		return nil, err
 	}
 	configAbilities, err := a.GetConfigAbilities()
 	if err != nil {
+		logrus.WithError(err).Error("An error occurred while fetching Abilities from config")
 		return nil, err
 	}
 	return &Abilities{
