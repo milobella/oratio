@@ -2,8 +2,8 @@ package server
 
 import (
 	"github.com/labstack/echo"
-	"github.com/milobella/oratio/internal"
 	"github.com/milobella/oratio/internal/models"
+	"github.com/milobella/oratio/internal/service"
 	"github.com/milobella/oratio/pkg/anima"
 	"github.com/milobella/oratio/pkg/cerebro"
 	"net/http"
@@ -12,7 +12,7 @@ import (
 type TextRequestHandler struct {
 	CerebroClient  *cerebro.Client
 	AnimaClient    *anima.Client
-	AbilityService internal.AbilityService
+	AbilityService service.AbilityService
 }
 
 func (rh *TextRequestHandler) HandleTextRequest(c echo.Context) (err error) {
@@ -24,19 +24,19 @@ func (rh *TextRequestHandler) HandleTextRequest(c echo.Context) (err error) {
 
 	// Execute the processing flow
 	nlu := rh.CerebroClient.UnderstandText(requestBody.Text)
-	nlg, visu, autoReprompt, context := rh.AbilityService.RequestAbility(nlu, requestBody.Context, requestBody.Device)
-	vocal := rh.AnimaClient.GenerateSentence(nlg)
+	response := rh.AbilityService.RequestAbility(nlu, requestBody.Context, requestBody.Device)
+	vocal := rh.AnimaClient.GenerateSentence(response.Nlg)
 
 	// Build the response's body
-	responseBody := &ResponseBody{Vocal: vocal, Visu: visu, AutoReprompt: autoReprompt, Context: context}
+	responseBody := &ResponseBody{Vocal: vocal, Visu: response.Visu, AutoReprompt: response.AutoReprompt, Context: response.Context}
 
 	// Write it on the http response
 	return c.JSON(http.StatusOK, responseBody)
 }
 
 type AbilityRequestHandler struct {
-	AbilitDAO models.AbilityDAO
-	AbilityService internal.AbilityService
+	AbilitDAO      models.AbilityDAO
+	AbilityService service.AbilityService
 }
 
 func (rh *AbilityRequestHandler) HandleGetAllAbilityRequest(c echo.Context) (err error) {

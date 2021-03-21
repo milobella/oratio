@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/milobella/oratio/pkg/anima"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,23 +26,23 @@ func NewClient(host string, port int, name string) *Client {
 	return &Client{Host: host, Port: port, url: url, client: http.Client{}, Name: name}
 }
 
-func (c Client) makeRequest(request Request) (response Response, err error) {
+func (c Client) makeRequest(request Request) (response* Response, err error) {
 	endpoint := strings.Join([]string{c.url, "resolve"}, "/")
 	postBody, err := json.Marshal(request)
 	if err != nil {
 		logrus.WithField("client", c.Name).Error(err)
-		return
+		return nil, err
 	}
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(postBody))
 	if err != nil {
 		logrus.WithField("client", c.Name).Error(err)
-		return
+		return nil, err
 	}
 
 	resp, err := c.client.Do(req)
 	if err != nil {
 		logrus.WithField("client", c.Name).Error(err)
-		return
+		return nil, err
 	}
 
 	logrus.WithField("client", c.Name).WithField("status", resp.StatusCode).Infof("%s %s", req.Method, req.URL)
@@ -52,31 +51,18 @@ func (c Client) makeRequest(request Request) (response Response, err error) {
 	defer resp.Body.Close()
 	if err != nil {
 		logrus.WithField("client", c.Name).Error(err)
-		return
+		return nil, err
 	}
 
 	err = json.Unmarshal(body, &response)
 	if err != nil {
 		logrus.WithField("client", c.Name).Error(err)
-		return
+		return nil, err
 	}
 	return
 }
 
 // CallAbility : Requests the ability
-func (c Client) CallAbility(request Request) (nlg anima.NLG, visu interface{}, autoReprompt bool, context Context) {
-	// By default the auto reprompt is false
-	autoReprompt = false
-	result, err := c.makeRequest(request)
-	if err != nil {
-		logrus.WithField("client", c.Name).Error(err)
-		nlg.Sentence = "error"
-		return
-	}
-
-	nlg = result.Nlg
-	visu = result.Visu
-	autoReprompt = result.AutoReprompt
-	context = result.Context
-	return
+func (c Client) CallAbility(request Request) (response* Response, err error) {
+	return c.makeRequest(request)
 }

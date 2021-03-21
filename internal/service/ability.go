@@ -1,4 +1,4 @@
-package internal
+package service
 
 import (
 	"fmt"
@@ -21,7 +21,7 @@ type Abilities struct {
 }
 
 type AbilityService interface {
-	RequestAbility(nlu cerebro.NLU, context ability.Context, device ability.Device) (anima.NLG, interface{}, bool, ability.Context)
+	RequestAbility(nlu cerebro.NLU, context ability.Context, device ability.Device) ability.Response
 	GetCacheAbilities() ([]*models.Ability, error)
 	GetDatabaseAbilities() ([]*models.Ability, error)
 	GetConfigAbilities() ([]*models.Ability, error)
@@ -60,20 +60,39 @@ func NewAbilityService(dao models.AbilityDAO, configAbilities []models.Ability, 
 }
 
 // RequestAbility: Call ability corresponding to the intent resolved by cerebro.
-func (a *abilityServiceImpl) RequestAbility(nlu cerebro.NLU, context ability.Context, device ability.Device) (anima.NLG, interface{}, bool, ability.Context) {
+func (a *abilityServiceImpl) RequestAbility(nlu cerebro.NLU, context ability.Context, device ability.Device) ability.Response {
 
 	intentOrAbility := nlu.GetBestIntentOr(context.LastAbility)
 
 	// TODO put personal request in anima
 	if intentOrAbility == "HELLO" {
-		return anima.NLG{Sentence: "Hello"}, nil, false, ability.Context{}
+		return ability.Response{
+			Nlg:          anima.NLG{Sentence: "Hello"},
+			Visu:         nil,
+			AutoReprompt: false,
+			Context:      ability.Context{},
+		}
 	}
 
 	if client, ok := a.resolveClient(intentOrAbility); ok {
-		return doRequest(client, ability.Request{Nlu: nlu, Context: context, Device: device})
+		if response, err := client.CallAbility(ability.Request{Nlu: nlu, Context: context, Device: device}); err != nil {
+			if err = a.clientsCache.Add(intentOrAbility, client, cache.DefaultExpiration); err != nil {
+				logrus.
+					WithError(err).
+					WithField("intentOrAbility", intentOrAbility).
+					WithField("client", client.Name).
+					Warning("An error occurred on adding the client in the cache.")
+			}
+			return *response
+		}
 	}
 
-	return anima.NLG{Sentence: "Oups !"}, nil, false, ability.Context{}
+	return ability.Response{
+		Nlg:          anima.NLG{Sentence: "Oups !"},
+		Visu:         nil,
+		AutoReprompt: false,
+		Context:      ability.Context{},
+	}
 }
 
 // GetCacheAbilities: Fetch the abilities from the cache.
@@ -142,12 +161,6 @@ func (a *abilityServiceImpl) GetAllAbilities() (*Abilities, error) {
 	}, nil
 }
 
-func doRequest(client *ability.Client, request ability.Request) (anima.NLG, interface{}, bool, ability.Context) {
-	nlg, visu, autoReprompt, context := client.CallAbility(request)
-	context.LastAbility = client.Name
-	return nlg, visu, autoReprompt, context
-}
-
 func (a *abilityServiceImpl) resolveClient(intentOrAbility string) (*ability.Client, bool) {
 	// Resolve from cache
 	if cachedClient, ok := a.clientsCache.Get(intentOrAbility); ok {
@@ -160,13 +173,6 @@ func (a *abilityServiceImpl) resolveClient(intentOrAbility string) (*ability.Cli
 	abilities, err := a.dao.GetByIntent(intentOrAbility)
 	if err == nil && len(abilities) > 0 {
 		client := ability.NewClient(abilities[0].Host, abilities[0].Port, abilities[0].Name)
-		if err = a.clientsCache.Add(intentOrAbility, client, cache.DefaultExpiration); err != nil {
-			logrus.
-				WithError(err).
-				WithField("intentOrAbility", intentOrAbility).
-				WithField("client", client.Name).
-				Warning("An error occurred on adding the client in the cache.")
-		}
 		logResolvedClientFrom("database", intentOrAbility, client.Name)
 		return client, true
 	}
