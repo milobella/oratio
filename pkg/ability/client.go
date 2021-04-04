@@ -39,6 +39,8 @@ func (c Client) makeRequest(request Request) (response* Response, err error) {
 		return nil, err
 	}
 
+	req.Header.Add("Content-Type", "application/json")
+
 	resp, err := c.client.Do(req)
 	if err != nil {
 		logrus.WithField("client", c.Name).Error(err)
