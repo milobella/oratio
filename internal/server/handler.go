@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/milobella/oratio/internal/models"
 	"github.com/milobella/oratio/internal/service"
 	"github.com/milobella/oratio/pkg/anima"

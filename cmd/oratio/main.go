@@ -2,19 +2,23 @@ package main
 
 import (
 	"fmt"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo-contrib/jaegertracing"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/milobella/oratio/internal/config"
 	"github.com/milobella/oratio/internal/logging"
 	"github.com/milobella/oratio/internal/models"
 	"github.com/milobella/oratio/internal/server"
 	"github.com/milobella/oratio/internal/service"
+	"github.com/milobella/oratio/internal/tracing"
 	"github.com/milobella/oratio/pkg/anima"
 	"github.com/milobella/oratio/pkg/cerebro"
 	"github.com/sirupsen/logrus"
 	"os"
 	"time"
 )
+
+const serviceName = "oratio"
 
 func init() {
 	// Log as JSON instead of the default ASCII formatter.
@@ -34,6 +38,14 @@ func init() {
 // - making some builders to initialize handlers
 // - reading configuration in one line (error handling inside the ReadConfiguration function
 func main() {
+
+	closer, err := tracing.InitializeTracing(serviceName)
+	if err != nil {
+		logrus.Printf("Could not initialize jaeger tracer: %s", err.Error())
+		return
+	}
+	defer closer.Close()
+
 	// Read configuration
 	conf, err := config.ReadConfiguration()
 	if err != nil { // Handle errors reading the config file
@@ -48,7 +60,7 @@ func main() {
 	animaClient := anima.NewClient(conf.Anima.Host, conf.Anima.Port, conf.Anima.RestituteEndpoint)
 
 	// Build the ability service
-	abilityDAO, err := models.NewAbilityDAOMongo(conf.AbilitiesDatabase.MongoUrl, "oratio", 3*time.Second)
+	abilityDAO, err := models.NewAbilityDAOMongo(conf.AbilitiesDatabase.MongoUrl, serviceName, 3*time.Second)
 	if err != nil {
 		logrus.WithError(err).Fatalf("Error initializing the Ability DAO.")
 	}
@@ -69,6 +81,8 @@ func main() {
 
 	// Initialize an echo server
 	e := echo.New()
+	c := jaegertracing.New(e, nil)
+	defer c.Close()
 
 	// Register middleware
 	e.Use(logging.InitializeLoggingMiddleware().Handle)
