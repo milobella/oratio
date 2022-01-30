@@ -2,20 +2,20 @@ package config
 
 import (
 	"encoding/json"
-	"github.com/milobella/oratio/internal/models"
+	"github.com/milobella/oratio/internal/model"
 	"github.com/sirupsen/logrus"
 	"time"
 )
 
-// Configuration
 type Configuration struct {
 	Server            ServerConfiguration
+	Tracing           TracingConfiguration
+	Auth              AuthConfiguration
 	Cerebro           CerebroConfiguration
 	Anima             AnimaConfiguration
-	Abilities         []models.Ability
+	Abilities         []model.Ability
 	AbilitiesCache    AbilitiesCacheConfiguration    `mapstructure:"abilities_cache"`
 	AbilitiesDatabase AbilitiesDatabaseConfiguration `mapstructure:"abilities_database"`
-	AppSecret         string                         `mapstructure:"app_secret"`
 }
 
 // fun String() : Serialization function of Configuration (for logging)
@@ -28,24 +28,37 @@ func (c Configuration) String() string {
 }
 
 type ServerConfiguration struct {
-	Port     int
-	LogLevel string `mapstructure:"log_level"`
+	ServiceName string `mapstructure:"service_name"`
+	Port        int
+	LogLevel    logrus.Level `mapstructure:"log_level"`
+}
+
+type TracingConfiguration struct {
+	ServiceName         string `mapstructure:"service_name"`
+	JaegerAgentHostName string `mapstructure:"jaeger_agent_hostname"`
+	JaegerAgentPort     int    `mapstructure:"jaeger_agent_port"`
+}
+
+type AuthConfiguration struct {
+	AppSecret string `mapstructure:"app_secret"`
 }
 
 type CerebroConfiguration struct {
-	Host string
-	Port int
+	Host               string
+	Port               int
 	UnderstandEndpoint string `mapstructure:"understand_endpoint"`
 }
 
 type AnimaConfiguration struct {
-	Host string
-	Port int
+	Host              string
+	Port              int
 	RestituteEndpoint string `mapstructure:"restitute_endpoint"`
 }
 
 type AbilitiesDatabaseConfiguration struct {
-	MongoUrl string `mapstructure:"mongo_url"`
+	MongoDatabase   string `mapstructure:"mongo_database"`
+	MongoUrl        string `mapstructure:"mongo_url"`
+	MongoCollection string `mapstructure:"mongo_collection"`
 }
 type AbilitiesCacheConfiguration struct {
 	Expiration      time.Duration

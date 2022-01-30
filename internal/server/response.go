@@ -1,6 +1,6 @@
 package server
 
-// ResponseBody is the main response body or oratio
+// ResponseBody is the main response body
 type ResponseBody struct {
 	Vocal        string      `json:"vocal,omitempty"`
 	Visu         interface{} `json:"visu,omitempty"`

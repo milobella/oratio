@@ -1,29 +1,50 @@
 package tracing
 
 import (
-	jaegercfg "github.com/uber/jaeger-client-go/config"
-	jaegerlog "github.com/uber/jaeger-client-go/log"
-	"github.com/uber/jaeger-lib/metrics"
-	"io"
+	"context"
+	"fmt"
+	"github.com/labstack/echo/v4"
+	"github.com/milobella/oratio/internal/config"
+	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
+	"go.opentelemetry.io/contrib/propagators/b3"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 )
 
-func InitializeTracing(serviceName string) (io.Closer, error) {
-	// Recommended configuration for production.
-	cfg, err := jaegercfg.FromEnv()
+func InitGlobalTracer(conf config.TracingConfiguration) (func(), error) {
+	// Create the Jaeger exporter
+	exporter, err := jaeger.New(jaeger.WithAgentEndpoint(
+		jaeger.WithAgentHost(conf.JaegerAgentHostName),
+		jaeger.WithAgentPort(fmt.Sprintf("%d", conf.JaegerAgentPort)),
+	))
 	if err != nil {
 		return nil, err
 	}
 
-	// Example logger and metrics factory. Use github.com/uber/jaeger-client-go/log
-	// and github.com/uber/jaeger-lib/metrics respectively to bind to real logging and metrics
-	// frameworks.
-	jLogger := jaegerlog.StdLogger
-	jMetricsFactory := metrics.NullFactory
-
-	// Initialize tracer with a logger and a metrics factory
-	return cfg.InitGlobalTracer(
-		serviceName,
-		jaegercfg.Logger(jLogger),
-		jaegercfg.Metrics(jMetricsFactory),
+	resources := resource.NewWithAttributes(
+		semconv.SchemaURL,
+		semconv.ServiceNameKey.String("milobella"),
+		semconv.ServiceVersionKey.String("1.0.0"),
+		semconv.ServiceInstanceIDKey.String("oratio"),
 	)
+	tp := sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(exporter),
+		sdktrace.WithResource(resources),
+	)
+	otel.SetTracerProvider(tp)
+	otel.SetTextMapPropagator(b3.New())
+
+	return func() {
+		if shutdownErr := tp.Shutdown(context.Background()); shutdownErr != nil {
+			logrus.Printf("Error shutting down tracer provider: %v", shutdownErr)
+		}
+	}, nil
+}
+
+func ApplyMiddleware(server *echo.Echo, conf config.TracingConfiguration) {
+	server.Use(otelecho.Middleware(conf.ServiceName))
 }
