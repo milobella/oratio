@@ -1,8 +1,9 @@
 package server
 
 import (
-	"github.com/labstack/echo"
-	"github.com/milobella/oratio/internal/models"
+	"github.com/labstack/echo/v4"
+	"github.com/milobella/oratio/internal/model"
+	"github.com/milobella/oratio/internal/persistence"
 	"github.com/milobella/oratio/internal/service"
 	"github.com/milobella/oratio/pkg/anima"
 	"github.com/milobella/oratio/pkg/cerebro"
@@ -36,7 +37,7 @@ func (rh *TextRequestHandler) HandleTextRequest(c echo.Context) (err error) {
 }
 
 type AbilityRequestHandler struct {
-	AbilitDAO      models.AbilityDAO
+	AbilitDAO      persistence.AbilityDAO
 	AbilityService service.AbilityService
 }
 
@@ -76,7 +77,7 @@ func (rh *AbilityRequestHandler) HandleGetAllAbilityRequest(c echo.Context) (err
 }
 
 func (rh *AbilityRequestHandler) HandleCreateAbilityRequest(c echo.Context) (err error) {
-	ability := new(models.Ability)
+	ability := new(model.Ability)
 	if err = c.Bind(ability); err != nil {
 		return
 	}

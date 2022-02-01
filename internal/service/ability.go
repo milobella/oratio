@@ -2,7 +2,8 @@ package service
 
 import (
 	"fmt"
-	"github.com/milobella/oratio/internal/models"
+	"github.com/milobella/oratio/internal/model"
+	"github.com/milobella/oratio/internal/persistence"
 	"github.com/milobella/oratio/pkg/ability"
 	"github.com/milobella/oratio/pkg/anima"
 	"github.com/milobella/oratio/pkg/cerebro"
@@ -15,16 +16,16 @@ import (
 const approximativeIntentsByAbility = 3
 
 type Abilities struct {
-	Cache    []*models.Ability `json:"cache"`
-	Database []*models.Ability `json:"database"`
-	Config   []*models.Ability `json:"config"`
+	Cache    []*model.Ability `json:"cache"`
+	Database []*model.Ability `json:"database"`
+	Config   []*model.Ability `json:"config"`
 }
 
 type AbilityService interface {
 	RequestAbility(nlu cerebro.NLU, context ability.Context, device ability.Device) ability.Response
-	GetCacheAbilities() ([]*models.Ability, error)
-	GetDatabaseAbilities() ([]*models.Ability, error)
-	GetConfigAbilities() ([]*models.Ability, error)
+	GetCacheAbilities() ([]*model.Ability, error)
+	GetDatabaseAbilities() ([]*model.Ability, error)
+	GetConfigAbilities() ([]*model.Ability, error)
 	GetAllAbilities() (*Abilities, error)
 }
 
@@ -34,7 +35,7 @@ type AbilityService interface {
 // Configuration is just here in a last resort, if database is not accessible for example.
 type abilityClients = map[string]*ability.Client
 
-func newAbilityClients(configAbilities []models.Ability) abilityClients {
+func newAbilityClients(configAbilities []model.Ability) abilityClients {
 	clientsMap := make(map[string]*ability.Client, len(configAbilities)*approximativeIntentsByAbility)
 	for _, ab := range configAbilities {
 		client := ability.NewClient(ab.Host, ab.Port, ab.Name)
@@ -46,12 +47,12 @@ func newAbilityClients(configAbilities []models.Ability) abilityClients {
 }
 
 type abilityServiceImpl struct {
-	dao                      models.AbilityDAO
+	dao                      persistence.AbilityDAO
 	clientsCache             *cache.Cache
 	abilityClientsFromConfig abilityClients
 }
 
-func NewAbilityService(dao models.AbilityDAO, configAbilities []models.Ability, defaultExpiration, cleanupInterval time.Duration) AbilityService {
+func NewAbilityService(dao persistence.AbilityDAO, configAbilities []model.Ability, defaultExpiration, cleanupInterval time.Duration) AbilityService {
 	return &abilityServiceImpl{
 		dao:                      dao,
 		clientsCache:             cache.New(defaultExpiration, cleanupInterval),
@@ -95,15 +96,15 @@ func (a *abilityServiceImpl) RequestAbility(nlu cerebro.NLU, context ability.Con
 	}
 }
 
-// GetCacheAbilities: Fetch the abilities from the cache.
-func (a *abilityServiceImpl) GetCacheAbilities() ([]*models.Ability, error) {
-	var abilities []*models.Ability
+// GetCacheAbilities fetch the abilities from the cache.
+func (a *abilityServiceImpl) GetCacheAbilities() ([]*model.Ability, error) {
+	var abilities []*model.Ability
 	for intent, item := range a.clientsCache.Items() {
 		client, ok := item.Object.(*ability.Client)
 		if !ok {
 			return nil, fmt.Errorf("error casting cache entry into %T", &ability.Client{})
 		}
-		abilities = append(abilities, &models.Ability{
+		abilities = append(abilities, &model.Ability{
 			Name:    client.Name,
 			Host:    client.Host,
 			Port:    client.Port,
@@ -111,22 +112,22 @@ func (a *abilityServiceImpl) GetCacheAbilities() ([]*models.Ability, error) {
 		})
 	}
 	if abilities == nil {
-		return []*models.Ability{}, nil
+		return []*model.Ability{}, nil
 	} else {
 		return abilities, nil
 	}
 }
 
-// GetDatabaseAbilities: Fetch the abilities from the database.
-func (a *abilityServiceImpl) GetDatabaseAbilities() ([]*models.Ability, error) {
+// GetDatabaseAbilities fetch the abilities from the database.
+func (a *abilityServiceImpl) GetDatabaseAbilities() ([]*model.Ability, error) {
 	return a.dao.GetAll()
 }
 
-// GetConfigAbilities: Fetch the abilities from the configuration.
-func (a *abilityServiceImpl) GetConfigAbilities() ([]*models.Ability, error) {
-	var abilities []*models.Ability
+// GetConfigAbilities fetch the abilities from the configuration.
+func (a *abilityServiceImpl) GetConfigAbilities() ([]*model.Ability, error) {
+	var abilities []*model.Ability
 	for intent, client := range a.abilityClientsFromConfig {
-		abilities = append(abilities, &models.Ability{
+		abilities = append(abilities, &model.Ability{
 			Name:    client.Name,
 			Host:    client.Host,
 			Port:    client.Port,
@@ -134,13 +135,13 @@ func (a *abilityServiceImpl) GetConfigAbilities() ([]*models.Ability, error) {
 		})
 	}
 	if abilities == nil {
-		return []*models.Ability{}, nil
+		return []*model.Ability{}, nil
 	} else {
 		return abilities, nil
 	}
 }
 
-// GetAllAbilities: Fetch the abilities from the every places (cache, database, config).
+// GetAllAbilities fetch the abilities from the every place (cache, database, config).
 func (a *abilityServiceImpl) GetAllAbilities() (*Abilities, error) {
 	cacheAbilities, err := a.GetCacheAbilities()
 	if err != nil {

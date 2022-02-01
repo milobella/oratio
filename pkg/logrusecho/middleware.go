@@ -1,7 +1,7 @@
 package logrusecho
 
 import (
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"net/http"
 
 	"github.com/sirupsen/logrus"
@@ -14,22 +14,22 @@ type LogrusMiddleware interface {
 
 // LogrusMiddlewareBuilder : Builder of Logrus HTTP middleware. All fields are optional and can be ommited.
 type LogrusMiddlewareBuilder interface {
-	// Activated request data from default ones (all default ones if ommited).
+	// ActivatedRequestData from default ones (all default ones if ommited).
 	ActivatedRequestData([]string) LogrusMiddlewareBuilder
 
-	// Custom request data (will replace a default one if same name).
+	// CustomRequestData (will replace a default one if same name).
 	CustomRequestData([]RequestData) LogrusMiddlewareBuilder
 
-	// Custom request message (if you don't like the awesome default one).
+	// RequestMessage (if you don't like the awesome default one).
 	RequestMessage(string) LogrusMiddlewareBuilder
 
-	// Activated response data from default ones (all default ones if ommited)
+	// ActivatedResponseData from default ones (all default ones if omitted)
 	ActivatedResponseData([]string) LogrusMiddlewareBuilder
 
-	// Custom response data (will replace a default one if same name)
+	// CustomResponseData (will replace a default one if same name)
 	CustomResponseData([]ResponseData) LogrusMiddlewareBuilder
 
-	// Custom response message (if you don't like the awesome default one).
+	// ResponseMessage (if you don't like the awesome default one).
 	ResponseMessage(string) LogrusMiddlewareBuilder
 
 	Build() LogrusMiddleware

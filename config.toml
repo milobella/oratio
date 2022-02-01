@@ -1,6 +1,11 @@
 [server]
 port = 9100
-log_level = "<root>=INFO"
+log_level = 5
+
+[tracing]
+service_name = "milobella"
+jaeger_agent_hostname = "0.0.0.0"
+jaeger_agent_port = 6783
 
 [cerebro]
 host = "0.0.0.0"
@@ -13,6 +18,8 @@ port = 9333
 restitute_endpoint = "/api/v1/restitute"
 
 [abilities_database]
+mongo_database = "oratio"
+mongo_collection = "abilities"
 mongo_url = "mongodb://localhost:27017"
 
 [abilities_cache]
@@ -20,13 +27,13 @@ expiration = "24h"
 cleanup_interval = "1h"
 
 [[abilities]]
-    name = "cinema"
-    intents = ["LAST_SHOWTIME"]
-    host = "localhost"
-    port = 10200
+name = "cinema"
+intents = ["LAST_SHOWTIME"]
+host = "localhost"
+port = 10200
 
 [[abilities]]
-    name = "shoppinglist"
-    intents = ["ADD_TO_LIST", "TRIGGER_SHOPPING_LIST"]
-    host = "localhost"
-    port = 4444
+name = "shoppinglist"
+intents = ["ADD_TO_LIST", "TRIGGER_SHOPPING_LIST"]
+host = "localhost"
+port = 4444

@@ -2,10 +2,11 @@ package config
 
 import (
 	"github.com/iamolegga/enviper"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
-func ReadConfiguration() (*Configuration, error) {
+func Read() *Configuration {
 	e := enviper.New(viper.New())
 	e.SetEnvPrefix("ORATIO")
 
@@ -16,10 +17,22 @@ func ReadConfiguration() (*Configuration, error) {
 	e.AddConfigPath(".")
 	err := e.ReadInConfig()
 	if err != nil {
-		return nil, err
+		fatal(err)
 	}
 
-	var C Configuration
-	err = e.Unmarshal(&C)
-	return &C, err
+	var config Configuration
+	if err = e.Unmarshal(&config); err != nil {
+		fatal(err)
+	} else {
+		logrus.Info("Successfully red configuration !")
+		logrus.Debugf("-> %+v", config)
+	}
+
+	logrus.SetLevel(config.Server.LogLevel)
+
+	return &config
+}
+
+func fatal(err error) {
+	logrus.WithError(err).Fatal("Error reading config.")
 }
