@@ -10,7 +10,7 @@ require (
 	github.com/spf13/viper v1.8.1
 	go.mongodb.org/mongo-driver v1.7.2
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.28.0
-	go.opentelemetry.io/contrib/propagators/b3 v1.2.0
+	go.opentelemetry.io/contrib/propagators/b3 v1.3.0
 	go.opentelemetry.io/otel v1.3.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.3.0
 	go.opentelemetry.io/otel/sdk v1.3.0
