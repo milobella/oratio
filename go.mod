@@ -3,7 +3,7 @@ module github.com/milobella/oratio
 go 1.17
 
 require (
-	github.com/iamolegga/enviper v1.3.0
+	github.com/iamolegga/enviper v1.4.0
 	github.com/labstack/echo/v4 v4.6.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/sirupsen/logrus v1.8.1
