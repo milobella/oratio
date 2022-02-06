@@ -79,10 +79,6 @@ func main() {
 	apiV1.GET("/abilities", abilityHandler.HandleGetAllAbilityRequest)
 	apiV1.POST("/abilities", abilityHandler.HandleCreateAbilityRequest)
 
-	// Keep the old route to ensure the compatibility
-	// TODO: remove old route after the migration is performed
-	applicationServer.POST("/talk/text", textHandler.HandleTextRequest)
-
 	// Run the echo server
 	logrus.Fatal(applicationServer.Start(fmt.Sprintf(":%d", conf.Server.Port)))
 }
