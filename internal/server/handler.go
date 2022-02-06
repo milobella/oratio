@@ -37,7 +37,7 @@ func (rh *TextRequestHandler) HandleTextRequest(c echo.Context) (err error) {
 }
 
 type AbilityRequestHandler struct {
-	AbilitDAO      persistence.AbilityDAO
+	AbilityDAO     persistence.AbilityDAO
 	AbilityService service.AbilityService
 }
 
@@ -82,7 +82,7 @@ func (rh *AbilityRequestHandler) HandleCreateAbilityRequest(c echo.Context) (err
 		return
 	}
 
-	if result, err := rh.AbilitDAO.CreateOrUpdate(ability); err != nil {
+	if result, err := rh.AbilityDAO.CreateOrUpdate(ability); err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	} else {
 		return c.JSON(http.StatusOK, result)

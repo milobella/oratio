@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/milobella/oratio/internal/auth"
 	"github.com/milobella/oratio/internal/config"
@@ -13,8 +16,6 @@ import (
 	"github.com/milobella/oratio/pkg/anima"
 	"github.com/milobella/oratio/pkg/cerebro"
 	"github.com/sirupsen/logrus"
-	"os"
-	"time"
 )
 
 func init() {
@@ -22,7 +23,6 @@ func init() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 
 	// Output to stdout instead of the default stderr
-	// Can be any io.Writer, see below for File example
 	logrus.SetOutput(os.Stdout)
 
 	logrus.SetReportCaller(true)
@@ -54,7 +54,7 @@ func main() {
 
 	// Build the ability handler
 	abilityHandler := &server.AbilityRequestHandler{
-		AbilitDAO:      abilityDAO,
+		AbilityDAO:     abilityDAO,
 		AbilityService: abilityService,
 	}
 
