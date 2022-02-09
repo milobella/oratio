@@ -4,6 +4,7 @@ package server
 type ResponseBody struct {
 	Vocal        string      `json:"vocal,omitempty"`
 	Visu         interface{} `json:"visu,omitempty"`
+	Actions      interface{} `json:"actions,omitempty"`
 	AutoReprompt bool        `json:"auto_reprompt,omitempty"`
 	Context      interface{} `json:"context,omitempty"`
 }
