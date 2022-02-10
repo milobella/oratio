@@ -46,11 +46,11 @@ func main() {
 
 	// Build the ability service
 	// TODO(Célian): The DAO being not initialized shouldn't be a reason of not being up. We should have a retry mechanism + health endpoint
-	abilityDAO, err := persistence.NewAbilityDAOMongo(conf.AbilitiesDatabase, 3*time.Second)
+	abilityDAO, err := persistence.NewAbilityDAOMongo(conf.Abilities.Database, 3*time.Second)
 	if err != nil {
 		logrus.WithError(err).Fatalf("Error initializing the Ability DAO.")
 	}
-	abilityService := service.NewAbilityService(abilityDAO, conf.Abilities, conf.AbilitiesCache.Expiration, conf.AbilitiesCache.CleanupInterval)
+	abilityService := service.NewAbilityService(abilityDAO, conf.Abilities)
 
 	// Build the ability handler
 	abilityHandler := &server.AbilityRequestHandler{

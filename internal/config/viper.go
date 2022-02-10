@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Read() *Configuration {
+func Read() *Config {
 	e := enviper.New(viper.New())
 	e.SetEnvPrefix("ORATIO")
 
@@ -20,7 +20,7 @@ func Read() *Configuration {
 		fatal(err)
 	}
 
-	var config Configuration
+	var config Config
 	if err = e.Unmarshal(&config); err != nil {
 		fatal(err)
 	} else {

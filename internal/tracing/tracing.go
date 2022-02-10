@@ -3,6 +3,7 @@ package tracing
 import (
 	"context"
 	"fmt"
+
 	"github.com/labstack/echo/v4"
 	"github.com/milobella/oratio/internal/config"
 	"github.com/sirupsen/logrus"
@@ -15,7 +16,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 )
 
-func InitGlobalTracer(conf config.TracingConfiguration) (func(), error) {
+func InitGlobalTracer(conf config.TracingConfig) (func(), error) {
 	// Create the Jaeger exporter
 	exporter, err := jaeger.New(jaeger.WithAgentEndpoint(
 		jaeger.WithAgentHost(conf.JaegerAgentHostName),
@@ -45,6 +46,6 @@ func InitGlobalTracer(conf config.TracingConfiguration) (func(), error) {
 	}, nil
 }
 
-func ApplyMiddleware(server *echo.Echo, conf config.TracingConfiguration) {
+func ApplyMiddleware(server *echo.Echo, conf config.TracingConfig) {
 	server.Use(otelecho.Middleware(conf.ServiceName))
 }

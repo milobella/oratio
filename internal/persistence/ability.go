@@ -2,13 +2,14 @@ package persistence
 
 import (
 	"context"
+	"time"
+
 	"github.com/milobella/oratio/internal/config"
 	"github.com/milobella/oratio/internal/model"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 )
 
 type AbilityDAO interface {
@@ -25,7 +26,7 @@ type abilityDAOMongo struct {
 	timeout    time.Duration
 }
 
-func NewAbilityDAOMongo(conf config.AbilitiesDatabaseConfiguration, timeout time.Duration) (AbilityDAO, error) {
+func NewAbilityDAOMongo(conf config.DatabaseConfig, timeout time.Duration) (AbilityDAO, error) {
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(conf.MongoUrl))
 	return &abilityDAOMongo{
 		client:     client,
