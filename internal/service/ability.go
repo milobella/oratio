@@ -36,12 +36,13 @@ type AbilityService interface {
 type abilityClients = map[string]*ability.Client
 
 func newAbilityClients(configAbilities []model.Ability) abilityClients {
-	clientsMap := make(map[string]*ability.Client, len(configAbilities)*approximativeIntentsByAbility)
+	clientsMap := make(map[string]*ability.Client, len(configAbilities)*(approximativeIntentsByAbility+1))
 	for _, ab := range configAbilities {
 		client := ability.NewClient(ab.Host, ab.Port, ab.Name)
 		for _, intent := range ab.Intents {
 			clientsMap[intent] = client
 		}
+		clientsMap[client.Name] = client
 	}
 	return clientsMap
 }
