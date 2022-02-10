@@ -6,7 +6,7 @@ import (
 	"github.com/milobella/oratio/internal/config"
 )
 
-func ApplyMiddleware(server *echo.Echo, configuration config.AuthConfiguration) {
+func ApplyMiddleware(server *echo.Echo, configuration config.AuthConfig) {
 	if len(configuration.AppSecret) > 0 {
 		// TODO: use custom claim to retrieve scopes and other user info (https://echo.labstack.com/cookbook/jwt)
 		//  https://github.com/milobella/oratio/issues/12

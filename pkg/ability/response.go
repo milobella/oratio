@@ -9,3 +9,7 @@ type Response struct {
 	AutoReprompt bool        `json:"auto_reprompt,omitempty"`
 	Context      Context     `json:"context,omitempty"`
 }
+
+func NewSimpleResponse(text string) *Response {
+	return &Response{Nlg: anima.NLG{Sentence: text}}
+}
