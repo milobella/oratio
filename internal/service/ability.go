@@ -102,9 +102,8 @@ func (a *abilityServiceImpl) RequestAbility(nlu cerebro.NLU, ctx ability.Context
 					WithField("intentOrAbility", intentOrAbility).
 					WithField("client", client.Name).
 					Warning("An error occurred on adding the client in the cache.")
-			} else {
-				response.Context.LastAbility = client.Name
 			}
+			response.Context.LastAbility = client.Name
 			return response
 		}
 	}
