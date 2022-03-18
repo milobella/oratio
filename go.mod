@@ -9,8 +9,8 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.10.1
 	go.mongodb.org/mongo-driver v1.8.4
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.29.0
-	go.opentelemetry.io/contrib/propagators/b3 v1.4.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.30.0
+	go.opentelemetry.io/contrib/propagators/b3 v1.5.0
 	go.opentelemetry.io/otel v1.5.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.5.0
 	go.opentelemetry.io/otel/sdk v1.5.0
