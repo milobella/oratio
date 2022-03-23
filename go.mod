@@ -11,14 +11,14 @@ require (
 	go.mongodb.org/mongo-driver v1.8.4
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.30.0
 	go.opentelemetry.io/contrib/propagators/b3 v1.5.0
-	go.opentelemetry.io/otel v1.5.0
-	go.opentelemetry.io/otel/exporters/jaeger v1.5.0
-	go.opentelemetry.io/otel/sdk v1.5.0
+	go.opentelemetry.io/otel v1.6.0
+	go.opentelemetry.io/otel/exporters/jaeger v1.6.0
+	go.opentelemetry.io/otel/sdk v1.6.0
 )
 
 require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
-	github.com/go-logr/logr v1.2.2 // indirect
+	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
@@ -45,7 +45,7 @@ require (
 	github.com/xdg-go/scram v1.0.2 // indirect
 	github.com/xdg-go/stringprep v1.0.2 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
-	go.opentelemetry.io/otel/trace v1.5.0 // indirect
+	go.opentelemetry.io/otel/trace v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
