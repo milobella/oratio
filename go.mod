@@ -9,11 +9,11 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.12.0
 	go.mongodb.org/mongo-driver v1.9.1
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.32.0
-	go.opentelemetry.io/contrib/propagators/b3 v1.7.0
-	go.opentelemetry.io/otel v1.7.0
-	go.opentelemetry.io/otel/exporters/jaeger v1.7.0
-	go.opentelemetry.io/otel/sdk v1.7.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.33.0
+	go.opentelemetry.io/contrib/propagators/b3 v1.8.0
+	go.opentelemetry.io/otel v1.8.0
+	go.opentelemetry.io/otel/exporters/jaeger v1.8.0
+	go.opentelemetry.io/otel/sdk v1.8.0
 )
 
 require (
@@ -46,7 +46,7 @@ require (
 	github.com/xdg-go/scram v1.0.2 // indirect
 	github.com/xdg-go/stringprep v1.0.2 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
-	go.opentelemetry.io/otel/trace v1.7.0 // indirect
+	go.opentelemetry.io/otel/trace v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
 	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
@@ -56,5 +56,5 @@ require (
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
