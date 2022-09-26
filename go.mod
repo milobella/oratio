@@ -9,7 +9,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/viper v1.13.0
 	go.mongodb.org/mongo-driver v1.10.2
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.36.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.36.1
 	go.opentelemetry.io/contrib/propagators/b3 v1.10.0
 	go.opentelemetry.io/otel v1.10.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.10.0
