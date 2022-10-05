@@ -1,6 +1,6 @@
 [server]
 port = 9100
-log_level = 5
+log_level = "DEBUG"
 
 [tracing]
 service_name = "milobella"
