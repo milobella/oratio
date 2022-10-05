@@ -29,7 +29,7 @@ func (c Config) String() string {
 type ServerConfig struct {
 	ServiceName string `mapstructure:"service_name"`
 	Port        int
-	LogLevel    logrus.Level `mapstructure:"log_level"`
+	LogLevel    string `mapstructure:"log_level"`
 }
 
 type TracingConfig struct {

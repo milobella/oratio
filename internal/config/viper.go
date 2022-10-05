@@ -28,7 +28,14 @@ func Read() *Config {
 		logrus.Debugf("-> %+v", config)
 	}
 
-	logrus.SetLevel(config.Server.LogLevel)
+	var level logrus.Level
+	level, err = logrus.ParseLevel(config.Server.LogLevel)
+	if err != nil {
+		logrus.SetLevel(logrus.InfoLevel)
+		logrus.WithError(err).Errorf("Error occured while parsing log level. Default to INFO")
+	} else {
+		logrus.SetLevel(level)
+	}
 
 	return &config
 }
