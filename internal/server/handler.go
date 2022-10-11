@@ -1,6 +1,8 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/milobella/oratio/internal/model"
 	"github.com/milobella/oratio/internal/persistence"
@@ -8,7 +10,6 @@ import (
 	"github.com/milobella/oratio/pkg/anima"
 	"github.com/milobella/oratio/pkg/cerebro"
 	"github.com/sirupsen/logrus"
-	"net/http"
 )
 
 type TextRequestHandler struct {
@@ -30,7 +31,13 @@ func (rh *TextRequestHandler) HandleTextRequest(c echo.Context) (err error) {
 	vocal := rh.AnimaClient.GenerateSentence(response.Nlg)
 
 	// Build the response's body
-	responseBody := &ResponseBody{Vocal: vocal, Visu: response.Visu, AutoReprompt: response.AutoReprompt, Context: response.Context}
+	responseBody := &ResponseBody{
+		Vocal:        vocal,
+		Visu:         response.Visu,
+		AutoReprompt: response.AutoReprompt,
+		Context:      response.Context,
+		Actions:      response.Actions,
+	}
 
 	// Write it on the http response
 	return c.JSON(http.StatusOK, responseBody)
