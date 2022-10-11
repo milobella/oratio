@@ -16,7 +16,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 )
 
-func InitGlobalTracer(conf config.TracingConfig) (func(), error) {
+func InitGlobalTracer(conf config.Tracing) (func(), error) {
 	// Create the Jaeger exporter
 	exporter, err := jaeger.New(jaeger.WithAgentEndpoint(
 		jaeger.WithAgentHost(conf.JaegerAgentHostName),
@@ -46,6 +46,6 @@ func InitGlobalTracer(conf config.TracingConfig) (func(), error) {
 	}, nil
 }
 
-func ApplyMiddleware(server *echo.Echo, conf config.TracingConfig) {
+func ApplyMiddleware(server *echo.Echo, conf config.Tracing) {
 	server.Use(otelecho.Middleware(conf.ServiceName))
 }

@@ -1,4 +1,4 @@
-package persistence
+package ability
 
 import (
 	"context"
@@ -12,13 +12,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type AbilityDAO interface {
+type DAO interface {
 	CreateOrUpdate(ability *model.Ability) (*model.Ability, error)
 	GetAll() ([]*model.Ability, error)
 	GetByIntent(intent string) ([]*model.Ability, error)
 }
 
-type abilityDAOMongo struct {
+type mongoDAO struct {
 	client     *mongo.Client
 	url        string
 	database   string
@@ -26,9 +26,9 @@ type abilityDAOMongo struct {
 	timeout    time.Duration
 }
 
-func NewAbilityDAOMongo(conf config.DatabaseConfig, timeout time.Duration) (AbilityDAO, error) {
+func NewMongoDAO(conf config.Database, timeout time.Duration) (DAO, error) {
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(conf.MongoUrl))
-	return &abilityDAOMongo{
+	return &mongoDAO{
 		client:     client,
 		url:        conf.MongoUrl,
 		database:   conf.MongoDatabase,
@@ -37,7 +37,7 @@ func NewAbilityDAOMongo(conf config.DatabaseConfig, timeout time.Duration) (Abil
 	}, err
 }
 
-func (dao *abilityDAOMongo) CreateOrUpdate(ability *model.Ability) (*model.Ability, error) {
+func (dao *mongoDAO) CreateOrUpdate(ability *model.Ability) (*model.Ability, error) {
 	collection := dao.client.Database(dao.database).Collection(dao.collection)
 
 	opts := options.FindOneAndReplace().SetUpsert(true)
@@ -51,7 +51,7 @@ func (dao *abilityDAOMongo) CreateOrUpdate(ability *model.Ability) (*model.Abili
 	return foundAbility, err
 }
 
-func (dao *abilityDAOMongo) GetAll() ([]*model.Ability, error) {
+func (dao *mongoDAO) GetAll() ([]*model.Ability, error) {
 	collection := dao.client.Database(dao.database).Collection(dao.collection)
 	ctx, _ := context.WithTimeout(context.Background(), dao.timeout)
 	cursor, err := collection.Find(ctx, bson.D{})
@@ -67,7 +67,7 @@ func (dao *abilityDAOMongo) GetAll() ([]*model.Ability, error) {
 	return results, nil
 }
 
-func (dao *abilityDAOMongo) GetByIntent(intent string) ([]*model.Ability, error) {
+func (dao *mongoDAO) GetByIntent(intent string) ([]*model.Ability, error) {
 	collection := dao.client.Database(dao.database).Collection(dao.collection)
 	ctx, _ := context.WithTimeout(context.Background(), dao.timeout)
 	cursor, err := collection.Find(ctx, bson.M{"intents": intent})
@@ -83,7 +83,7 @@ func (dao *abilityDAOMongo) GetByIntent(intent string) ([]*model.Ability, error)
 	return results, nil
 }
 
-func (dao *abilityDAOMongo) logError(err error, message string) {
+func (dao *mongoDAO) logError(err error, message string) {
 	logrus.WithError(err).
 		WithField("url", dao.url).
 		WithField("database", dao.database).
