@@ -3,18 +3,13 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/milobella/oratio/internal/auth"
 	"github.com/milobella/oratio/internal/config"
+	"github.com/milobella/oratio/internal/handler"
 	"github.com/milobella/oratio/internal/logging"
-	"github.com/milobella/oratio/internal/persistence"
-	"github.com/milobella/oratio/internal/server"
-	"github.com/milobella/oratio/internal/service"
 	"github.com/milobella/oratio/internal/tracing"
-	"github.com/milobella/oratio/pkg/anima"
-	"github.com/milobella/oratio/pkg/cerebro"
 	"github.com/sirupsen/logrus"
 )
 
@@ -28,8 +23,6 @@ func init() {
 	logrus.SetReportCaller(true)
 }
 
-//TODO simplify the main
-// - making some builders to initialize handlers
 func main() {
 	// Read configuration
 	conf := config.Read()
@@ -40,45 +33,21 @@ func main() {
 	}
 	defer shutdown()
 
-	// Initialize clients
-	cerebroClient := cerebro.NewClient(conf.Cerebro.Host, conf.Cerebro.Port, conf.Cerebro.UnderstandEndpoint)
-	animaClient := anima.NewClient(conf.Anima.Host, conf.Anima.Port, conf.Anima.RestituteEndpoint)
-
-	// Build the ability service
-	// TODO(Célian): The DAO being not initialized shouldn't be a reason of not being up. We should have a retry mechanism + health endpoint
-	abilityDAO, err := persistence.NewAbilityDAOMongo(conf.Abilities.Database, 3*time.Second)
-	if err != nil {
-		logrus.WithError(err).Fatalf("Error initializing the Ability DAO.")
-	}
-	abilityService := service.NewAbilityService(abilityDAO, conf.Abilities)
-
-	// Build the ability handler
-	abilityHandler := &server.AbilityRequestHandler{
-		AbilityDAO:     abilityDAO,
-		AbilityService: abilityService,
-	}
-
-	// Build the text handler
-	textHandler := server.TextRequestHandler{
-		CerebroClient:  cerebroClient,
-		AnimaClient:    animaClient,
-		AbilityService: abilityService,
-	}
-
 	// Init an echo server
-	applicationServer := echo.New()
+	server := echo.New()
 
-	// Register middlewares
-	tracing.ApplyMiddleware(applicationServer, conf.Tracing)
-	logging.ApplyMiddleware(applicationServer)
-	auth.ApplyMiddleware(applicationServer, conf.Auth)
+	// Create and register middlewares
+	tracing.ApplyMiddleware(server, conf.Tracing)
+	logging.ApplyMiddleware(server)
+	auth.ApplyMiddleware(server, conf.Auth)
 
-	// Register handlers
-	apiV1 := applicationServer.Group("/api/v1")
-	apiV1.POST("/talk/text", textHandler.HandleTextRequest)
-	apiV1.GET("/abilities", abilityHandler.HandleGetAllAbilityRequest)
-	apiV1.POST("/abilities", abilityHandler.HandleCreateAbilityRequest)
+	// Create and register handlers
+	handlers := handler.New(conf)
+	apiV1 := server.Group("/api/v1")
+	apiV1.POST("/talk/text", handlers.Text)
+	apiV1.GET("/abilities", handlers.GetAbilities)
+	apiV1.POST("/abilities", handlers.CreateAbility)
 
 	// Run the echo server
-	logrus.Fatal(applicationServer.Start(fmt.Sprintf(":%d", conf.Server.Port)))
+	logrus.Fatal(server.Start(fmt.Sprintf(":%d", conf.Server.Port)))
 }
