@@ -90,13 +90,12 @@ func (s *serviceImpl) RequestAbility(nlu cerebro.NLU, ctx ability.Context, devic
 
 	if client, ok := s.resolveClient(intentOrAbility); ok {
 		if response, err := client.CallAbility(ability.Request{Nlu: nlu, Context: ctx, Device: device}); err == nil {
-			if err = s.clientsCache.Add(intentOrAbility, client, cache.DefaultExpiration); err != nil {
-				logrus.
-					WithError(err).
-					WithField("intentOrAbility", intentOrAbility).
-					WithField("client", client.Name).
-					Warning("An error occurred on adding the client in the cache.")
-			}
+			// The call to the ability is a success.
+
+			// Then we update the cache, only if not already existing.
+			// If we always set the client in the cache, it would never expire.
+			_ = s.clientsCache.Add(intentOrAbility, client, cache.DefaultExpiration)
+			// And we make sure the response contains the last ability used.
 			response.Context.LastAbility = client.Name
 			return response
 		}
