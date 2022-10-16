@@ -106,9 +106,8 @@ func (s *serviceImpl) RequestAbility(nlu cerebro.NLU, ctx ability.Context, devic
 
 // GetCacheAbilities fetch the abilities from the cache.
 func (s *serviceImpl) GetCacheAbilities() ([]*model.Ability, error) {
-	cacheItems := s.clientsCache.Items()
-	abilities := make([]*model.Ability, len(cacheItems))
-	for intent, item := range cacheItems {
+	abilities := make([]*model.Ability, 0)
+	for intent, item := range s.clientsCache.Items() {
 		client, ok := item.Object.(*ability.Client)
 		if !ok {
 			return nil, fmt.Errorf("error casting cache entry into %T", &ability.Client{})
@@ -130,7 +129,7 @@ func (s *serviceImpl) GetDatabaseAbilities() ([]*model.Ability, error) {
 
 // GetConfigAbilities fetch the abilities from the configuration.
 func (s *serviceImpl) GetConfigAbilities() ([]*model.Ability, error) {
-	abilities := make([]*model.Ability, len(s.clientsFromConfig))
+	abilities := make([]*model.Ability, 0)
 	for intent, client := range s.clientsFromConfig {
 		abilities = append(abilities, &model.Ability{
 			Name:    client.Name,
