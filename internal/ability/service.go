@@ -90,13 +90,12 @@ func (s *serviceImpl) RequestAbility(nlu cerebro.NLU, ctx ability.Context, devic
 
 	if client, ok := s.resolveClient(intentOrAbility); ok {
 		if response, err := client.CallAbility(ability.Request{Nlu: nlu, Context: ctx, Device: device}); err == nil {
-			if err = s.clientsCache.Add(intentOrAbility, client, cache.DefaultExpiration); err != nil {
-				logrus.
-					WithError(err).
-					WithField("intentOrAbility", intentOrAbility).
-					WithField("client", client.Name).
-					Warning("An error occurred on adding the client in the cache.")
-			}
+			// The call to the ability is a success.
+
+			// Then we update the cache, only if not already existing.
+			// If we always set the client in the cache, it would never expire.
+			_ = s.clientsCache.Add(intentOrAbility, client, cache.DefaultExpiration)
+			// And we make sure the response contains the last ability used.
 			response.Context.LastAbility = client.Name
 			return response
 		}
@@ -107,8 +106,9 @@ func (s *serviceImpl) RequestAbility(nlu cerebro.NLU, ctx ability.Context, devic
 
 // GetCacheAbilities fetch the abilities from the cache.
 func (s *serviceImpl) GetCacheAbilities() ([]*model.Ability, error) {
-	var abilities []*model.Ability
-	for intent, item := range s.clientsCache.Items() {
+	cacheItems := s.clientsCache.Items()
+	abilities := make([]*model.Ability, len(cacheItems))
+	for intent, item := range cacheItems {
 		client, ok := item.Object.(*ability.Client)
 		if !ok {
 			return nil, fmt.Errorf("error casting cache entry into %T", &ability.Client{})
@@ -120,11 +120,7 @@ func (s *serviceImpl) GetCacheAbilities() ([]*model.Ability, error) {
 			Intents: []string{intent},
 		})
 	}
-	if abilities == nil {
-		return []*model.Ability{}, nil
-	} else {
-		return abilities, nil
-	}
+	return abilities, nil
 }
 
 // GetDatabaseAbilities fetch the abilities from the database.
@@ -134,7 +130,7 @@ func (s *serviceImpl) GetDatabaseAbilities() ([]*model.Ability, error) {
 
 // GetConfigAbilities fetch the abilities from the configuration.
 func (s *serviceImpl) GetConfigAbilities() ([]*model.Ability, error) {
-	var abilities []*model.Ability
+	abilities := make([]*model.Ability, len(s.clientsFromConfig))
 	for intent, client := range s.clientsFromConfig {
 		abilities = append(abilities, &model.Ability{
 			Name:    client.Name,
@@ -143,39 +139,29 @@ func (s *serviceImpl) GetConfigAbilities() ([]*model.Ability, error) {
 			Intents: []string{intent},
 		})
 	}
-	if abilities == nil {
-		return []*model.Ability{}, nil
-	} else {
-		return abilities, nil
-	}
+	return abilities, nil
 }
 
 // GetAllAbilities fetch the abilities from the every place (cache, database, config).
 func (s *serviceImpl) GetAllAbilities() (*model.Abilities, error) {
-	var cacheAbilities []*model.Ability
-	var databaseAbilities []*model.Ability
-	var configAbilities []*model.Ability
+	result := &model.Abilities{}
 	var err error
-	cacheAbilities, err = s.GetCacheAbilities()
+	result.Cache, err = s.GetCacheAbilities()
 	if err != nil {
 		logrus.WithError(err).Error("An error occurred while fetching Abilities from cache")
 		return nil, err
 	}
-	databaseAbilities, err = s.GetDatabaseAbilities()
+	result.Database, err = s.GetDatabaseAbilities()
 	if err != nil {
 		logrus.WithError(err).Error("An error occurred while fetching Abilities from database")
 		return nil, err
 	}
-	configAbilities, err = s.GetConfigAbilities()
+	result.Config, err = s.GetConfigAbilities()
 	if err != nil {
 		logrus.WithError(err).Error("An error occurred while fetching Abilities from config")
 		return nil, err
 	}
-	return &model.Abilities{
-		Cache:    cacheAbilities,
-		Database: databaseAbilities,
-		Config:   configAbilities,
-	}, nil
+	return result, nil
 }
 func (s *serviceImpl) CreateOrUpdate(ability *model.Ability) (*model.Ability, error) {
 	return s.dao.CreateOrUpdate(ability)

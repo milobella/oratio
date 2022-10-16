@@ -59,7 +59,7 @@ func (dao *mongoDAO) GetAll() ([]*model.Ability, error) {
 		dao.logError(err, "Error creating the database cursor")
 		return []*model.Ability{}, err
 	}
-	var results []*model.Ability
+	results := make([]*model.Ability, 0)
 	if err = cursor.All(ctx, &results); err != nil {
 		dao.logError(err, "Error getting results from the cursor")
 		return []*model.Ability{}, err
