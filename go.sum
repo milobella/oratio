@@ -346,6 +346,8 @@ go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0
 go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.36.3/go.mod h1:nRQX3pPsFnVqTUO56X3DQSd6U3Y100mbI8EZiKtwRUo=
 go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.36.4 h1:KbVA3Thz7WIalFULbno4Zv1JbNFx9A2H6cpsRopgyVw=
 go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.36.4/go.mod h1:IkQD0Ib5Ii3VrQnfD5dRh+WFQtwz7tnfcN61xaQbYfU=
+go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.37.0 h1:ulb5vZ8WicVpd8VYEK5e5CNg24cNLRCJMvIYzaea+Uc=
+go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.37.0/go.mod h1:L+OhdrTgEHOTTTNVho06Y25mLc1/9npqjjTziGeK4vU=
 go.opentelemetry.io/contrib/propagators/b3 v1.11.0 h1:LAzUx5os6NwhtEv166/k3m6TWHabuN2jJYoMFws6t1M=
 go.opentelemetry.io/contrib/propagators/b3 v1.11.0/go.mod h1:mD7gBpRoRgGxheDunJ5SnNQNlo13EhfnLtqhs3rsDV0=
 go.opentelemetry.io/contrib/propagators/b3 v1.11.1 h1:icQ6ttRV+r/2fnU46BIo/g/mPu6Rs5Ug8Rtohe3KqzI=
